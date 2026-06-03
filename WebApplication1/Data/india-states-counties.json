@@ -1,0 +1,278 @@
+[
+  {
+    "stateCode": "KA",
+    "stateName": "Karnataka",
+    "countryCode": "IN",
+    "latitude": 15.3173,
+    "longitude": 75.7139,
+    "counties": [
+      {
+        "countyCode": "BLR",
+        "countyName": "Bangalore Urban",
+        "latitude": 12.9716,
+        "longitude": 77.5946
+      },
+      {
+        "countyCode": "MYS",
+        "countyName": "Mysore",
+        "latitude": 12.2958,
+        "longitude": 76.6394
+      },
+      {
+        "countyCode": "MND",
+        "countyName": "Mandya",
+        "latitude": 12.5239,
+        "longitude": 76.8958
+      },
+      {
+        "countyCode": "HBL",
+        "countyName": "Hubli",
+        "latitude": 15.3647,
+        "longitude": 75.1240
+      },
+      {
+        "countyCode": "DWD",
+        "countyName": "Dharwad",
+        "latitude": 15.4589,
+        "longitude": 75.0078
+      },
+      {
+        "countyCode": "BLG",
+        "countyName": "Belagavi",
+        "latitude": 15.8497,
+        "longitude": 74.4977
+      },
+      {
+        "countyCode": "KLR",
+        "countyName": "Kolar",
+        "latitude": 13.1367,
+        "longitude": 78.1291
+      },
+      {
+        "countyCode": "TMK",
+        "countyName": "Tumkur",
+        "latitude": 13.3409,
+        "longitude": 77.1010
+      },
+      {
+        "countyCode": "CKM",
+        "countyName": "Chikmagalur",
+        "latitude": 13.3153,
+        "longitude": 75.7754
+      },
+      {
+        "countyCode": "MNG",
+        "countyName": "Mangalore",
+        "latitude": 12.9141,
+        "longitude": 74.8560
+      }
+    ]
+  },
+  {
+    "stateCode": "TN",
+    "stateName": "Tamil Nadu",
+    "countryCode": "IN",
+    "latitude": 11.1271,
+    "longitude": 78.6569,
+    "counties": [
+      {
+        "countyCode": "CHE",
+        "countyName": "Chennai",
+        "latitude": 13.0827,
+        "longitude": 80.2707
+      },
+      {
+        "countyCode": "CBE",
+        "countyName": "Coimbatore",
+        "latitude": 11.0168,
+        "longitude": 76.9558
+      },
+      {
+        "countyCode": "MDU",
+        "countyName": "Madurai",
+        "latitude": 9.9252,
+        "longitude": 78.1198
+      },
+      {
+        "countyCode": "SLM",
+        "countyName": "Salem",
+        "latitude": 11.6643,
+        "longitude": 78.1460
+      },
+      {
+        "countyCode": "ERD",
+        "countyName": "Erode",
+        "latitude": 11.3410,
+        "longitude": 77.7172
+      },
+      {
+        "countyCode": "TPR",
+        "countyName": "Tiruppur",
+        "latitude": 11.1085,
+        "longitude": 77.3411
+      },
+      {
+        "countyCode": "TRC",
+        "countyName": "Trichy",
+        "latitude": 10.7905,
+        "longitude": 78.7047
+      },
+      {
+        "countyCode": "VLR",
+        "countyName": "Vellore",
+        "latitude": 12.9165,
+        "longitude": 79.1325
+      },
+      {
+        "countyCode": "TNV",
+        "countyName": "Tirunelveli",
+        "latitude": 8.7139,
+        "longitude": 77.7567
+      },
+      {
+        "countyCode": "KNY",
+        "countyName": "Kanyakumari",
+        "latitude": 8.0883,
+        "longitude": 77.5385
+      }
+    ]
+  },
+  {
+    "stateCode": "AP",
+    "stateName": "Andhra Pradesh",
+    "countryCode": "IN",
+    "latitude": 15.9129,
+    "longitude": 79.7400,
+    "counties": [
+      {
+        "countyCode": "VSK",
+        "countyName": "Visakhapatnam",
+        "latitude": 17.6868,
+        "longitude": 83.2185
+      },
+      {
+        "countyCode": "VJW",
+        "countyName": "Vijayawada",
+        "latitude": 16.5062,
+        "longitude": 80.6480
+      },
+      {
+        "countyCode": "GNT",
+        "countyName": "Guntur",
+        "latitude": 16.3067,
+        "longitude": 80.4365
+      },
+      {
+        "countyCode": "NEL",
+        "countyName": "Nellore",
+        "latitude": 14.4426,
+        "longitude": 79.9865
+      },
+      {
+        "countyCode": "KDP",
+        "countyName": "Kadapa",
+        "latitude": 14.4673,
+        "longitude": 78.8242
+      },
+      {
+        "countyCode": "KNL",
+        "countyName": "Kurnool",
+        "latitude": 15.8281,
+        "longitude": 78.0373
+      },
+      {
+        "countyCode": "ANP",
+        "countyName": "Anantapur",
+        "latitude": 14.6819,
+        "longitude": 77.6006
+      },
+      {
+        "countyCode": "RJM",
+        "countyName": "Rajahmundry",
+        "latitude": 17.0005,
+        "longitude": 81.8040
+      },
+      {
+        "countyCode": "ELR",
+        "countyName": "Eluru",
+        "latitude": 16.7107,
+        "longitude": 81.0952
+      },
+      {
+        "countyCode": "ONG",
+        "countyName": "Ongole",
+        "latitude": 15.5057,
+        "longitude": 80.0499
+      }
+    ]
+  },
+  {
+    "stateCode": "TS",
+    "stateName": "Telangana",
+    "countryCode": "IN",
+    "latitude": 18.1124,
+    "longitude": 79.0193,
+    "counties": [
+      {
+        "countyCode": "HYD",
+        "countyName": "Hyderabad",
+        "latitude": 17.3850,
+        "longitude": 78.4867
+      },
+      {
+        "countyCode": "WRG",
+        "countyName": "Warangal",
+        "latitude": 17.9784,
+        "longitude": 79.5941
+      },
+      {
+        "countyCode": "NZB",
+        "countyName": "Nizamabad",
+        "latitude": 18.6725,
+        "longitude": 78.0941
+      },
+      {
+        "countyCode": "KHM",
+        "countyName": "Khammam",
+        "latitude": 17.2473,
+        "longitude": 80.1514
+      },
+      {
+        "countyCode": "KRM",
+        "countyName": "Karimnagar",
+        "latitude": 18.4386,
+        "longitude": 79.1288
+      },
+      {
+        "countyCode": "MDK",
+        "countyName": "Medak",
+        "latitude": 18.0455,
+        "longitude": 78.2602
+      },
+      {
+        "countyCode": "RNG",
+        "countyName": "Rangareddy",
+        "latitude": 17.3891,
+        "longitude": 78.4011
+      },
+      {
+        "countyCode": "ADB",
+        "countyName": "Adilabad",
+        "latitude": 19.6641,
+        "longitude": 78.5320
+      },
+      {
+        "countyCode": "MHB",
+        "countyName": "Mahabubnagar",
+        "latitude": 16.7488,
+        "longitude": 77.9854
+      },
+      {
+        "countyCode": "SRC",
+        "countyName": "Suryapet",
+        "latitude": 17.1405,
+        "longitude": 79.6207
+      }
+    ]
+  }
+]
