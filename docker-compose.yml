@@ -1,0 +1,56 @@
+services:
+
+  postgres:
+    build:
+      context: ./postgres
+
+    container_name: ai-postgres-db
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ivar.,.@123P
+      POSTGRES_DB: geoaccessdbVG
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./WebApplication1
+
+    container_name: api-test
+
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+
+    ports:
+      - "8080:8080"
+
+    depends_on:
+      - postgres
+
+    restart: unless-stopped
+
+  ui:
+    build:
+      context: ./Ui
+
+    container_name: ui-test
+
+    ports:
+      - "3000:80"
+
+    depends_on:
+      - api
+
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    external: true
+    name: ai-power-accesscontrolsystem_postgres_data

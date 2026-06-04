@@ -23,6 +23,17 @@ using WebApplication1.Repositories.implementations.PropertyStarer;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowUI", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 
 builder.Services.AddControllers();//this is for normal json reply 
 builder.Services
@@ -156,6 +167,7 @@ using (var scope = app.Services.CreateScope())
 //}
 
 app.UseHttpsRedirection();
+app.UseCors("AllowUI");
 //jwt start //
 app.UseAuthentication();
 

@@ -10,104 +10,24 @@ import {
   DialogContent,
   DialogActions,
   Divider,
-  Grid,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
   Alert,
 } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import WarningIcon from '@mui/icons-material/Warning'
 import ErrorIcon from '@mui/icons-material/Error'
 import HomeIcon from '@mui/icons-material/Home'
 import DescriptionIcon from '@mui/icons-material/Description'
-import GavelIcon from '@mui/icons-material/Gavel'
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance'
 import SecurityIcon from '@mui/icons-material/Security'
 
 interface StarterWorkspaceProps {
-  starterJson: string
+  starterJson?: string
   parcelId?: string
   county?: string
   state?: string
-  onBack: () => void
+  onBack?: () => void
 }
 
-interface StarterData {
-  parcelId: string
-  propertyAddress: string
-  county: string
-  state: string
-  legalDescription: string
-  vestingInformation: {
-    currentOwners: string[]
-    vestingType: string
-    ownershipPercentage: string
-  }
-  deedInformation: {
-    instrumentNumber: string
-    bookPage: string
-    recordingDate: string
-    effectiveDate: string
-    grantors: string[]
-    grantees: string[]
-  }
-  taxInformation: {
-    parcelNumber: string
-    taxStatus: string
-    delinquentTaxes: boolean
-    taxAmountDue: string
-  }
-  mortgages: Array<{
-    instrumentNumber: string
-    recordingDate: string
-    lender: string
-    borrower: string
-    amount: string
-    status: string
-  }>
-  liens: Array<any>
-  judgments: Array<{
-    courtCaseRef: string
-    status: string
-  }>
-  easements: Array<any>
-  restrictions: Array<any>
-  encumbrances: Array<{
-    instrumentNumber: string
-    recordingDate: string
-    type: string
-    status: string
-  }>
-  chainOfTitle: Array<any>
-  requirements: Array<any>
-  exceptions: Array<any>
-  titleIssues: Array<{
-    issueType: string
-    severity: string
-    description: string
-    recommendedAction: string
-  }>
-  missingDocuments: Array<any>
-  documentsReviewed: Array<any>
-  riskAssessment: {
-    overallRisk: string
-    riskFactors: Array<{
-      factor: string
-      severity: string
-    }>
-  }
-  titleSummary: string
-  confidenceScore: number
-}
-
-function StarterWorkspace({ starterJson, parcelId, county, state, onBack }: StarterWorkspaceProps) {
+function StarterWorkspace({ starterJson = '{}', parcelId, county, state, onBack = () => {} }: StarterWorkspaceProps) {
   const [selectedIssue, setSelectedIssue] = useState<any>(null)
   const [selectedFact, setSelectedFact] = useState<any>(null)
   
@@ -135,19 +55,6 @@ function StarterWorkspace({ starterJson, parcelId, county, state, onBack }: Star
         return 'success'
       default:
         return 'default'
-    }
-  }
-
-  const getRiskColor = (risk: string) => {
-    switch (risk?.toUpperCase()) {
-      case 'HIGH':
-        return '#ef4444'
-      case 'MEDIUM':
-        return '#f59e0b'
-      case 'LOW':
-        return '#10b981'
-      default:
-        return '#6b7280'
     }
   }
 
@@ -261,54 +168,7 @@ function StarterWorkspace({ starterJson, parcelId, county, state, onBack }: Star
     { label: 'Overall Risk', value: data.riskAssessment?.overallRisk || 'Unknown', icon: <SecurityIcon sx={{ color: '#16a34a' }} />, highlight: true },
   ]
 
-  const renderValue = (value: any) => {
-    if (value === null || value === undefined || value === '') {
-      return <Typography variant="body2" sx={{ color: '#6b7280' }}>—</Typography>
-    }
 
-    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-      return (
-        <Typography variant="body2" sx={{ fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={String(value)}>
-          {String(value)}
-        </Typography>
-      )
-    }
-
-    if (Array.isArray(value)) {
-      return (
-        <Box>
-          {value.slice(0, 5).map((v, i) => (
-            <Typography key={i} variant="caption" sx={{ display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={typeof v === 'object' ? JSON.stringify(v) : String(v)}>
-              • {typeof v === 'object' ? JSON.stringify(v) : String(v)}
-            </Typography>
-          ))}
-          {value.length > 5 && <Typography variant="caption" sx={{ color: '#6b7280' }}>and {value.length - 5} more…</Typography>}
-        </Box>
-      )
-    }
-
-    if (typeof value === 'object') {
-      const entries = Object.entries(value)
-      const maxShow = 8
-      return (
-        <Box sx={{ display: 'grid', gap: 0.5 }}>
-          {entries.slice(0, maxShow).map(([k, v], i) => (
-            <Box key={i} sx={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 1, alignItems: 'center' }}>
-              <Typography variant="caption" sx={{ fontWeight: 700, color: '#374151' }}>{prettifyKey(k)}</Typography>
-              <Typography variant="caption" sx={{ color: '#111827', textAlign: 'right', maxWidth: '60%' }} title={typeof v === 'object' ? JSON.stringify(v) : String(v)}>
-                {typeof v === 'object' ? JSON.stringify(v) : String(v) || '—'}
-              </Typography>
-            </Box>
-          ))}
-          {entries.length > maxShow && (
-            <Typography variant="caption" sx={{ color: '#6b7280' }}>and {entries.length - maxShow} more…</Typography>
-          )}
-        </Box>
-      )
-    }
-
-    return <Typography variant="body2">{String(value)}</Typography>
-  }
 
   return (
     <Box sx={{ p: 3, bgcolor: '#f8fafc', minHeight: '100vh' }}>
@@ -323,9 +183,9 @@ function StarterWorkspace({ starterJson, parcelId, county, state, onBack }: Star
         Overview of key property information and documents.
       </Typography>
 
-      <Grid container spacing={2} sx={{ mb: 3 }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(4, 1fr)' }, gap: 2, mb: 3 }}>
         {summaryItems.map((item) => (
-          <Grid item xs={12} sm={6} md={3} key={item.label}>
+          <Box key={item.label}>
             <Card sx={{ bgcolor: item.highlight ? '#ecfdf5' : '#ffffff', border: '1px solid rgba(15,23,42,0.08)', minHeight: 120 }}>
               <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 42, height: 42, borderRadius: 1, bgcolor: item.highlight ? '#dcfce7' : '#eef2ff' }}>
@@ -341,12 +201,12 @@ function StarterWorkspace({ starterJson, parcelId, county, state, onBack }: Star
                 </Box>
               </CardContent>
             </Card>
-          </Grid>
+          </Box>
         ))}
-      </Grid>
+      </Box>
 
-      <Grid container spacing={2} sx={{ mb: 4 }}>
-        <Grid item xs={12} md={4}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 2, mb: 4 }}>
+        <Box>
           <Card sx={{ border: '1px solid rgba(15,23,42,0.08)', minHeight: 220 }}>
             <CardContent>
               <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>Property Information</Typography>
@@ -357,8 +217,9 @@ function StarterWorkspace({ starterJson, parcelId, county, state, onBack }: Star
               {renderCardRow('Tax Status', data.taxInformation?.taxStatus || '—')}
             </CardContent>
           </Card>
-        </Grid>
-        <Grid item xs={12} md={4}>
+        </Box>
+
+        <Box>
           <Card sx={{ border: '1px solid rgba(15,23,42,0.08)', minHeight: 220 }}>
             <CardContent>
               <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>Risk Assessment</Typography>
@@ -377,8 +238,9 @@ function StarterWorkspace({ starterJson, parcelId, county, state, onBack }: Star
               </Box>
             </CardContent>
           </Card>
-        </Grid>
-        <Grid item xs={12} md={4}>
+        </Box>
+
+        <Box>
           <Card sx={{ border: '1px solid rgba(15,23,42,0.08)', minHeight: 220 }}>
             <CardContent>
               <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>Key Verification</Typography>
@@ -391,8 +253,8 @@ function StarterWorkspace({ starterJson, parcelId, county, state, onBack }: Star
               ))}
             </CardContent>
           </Card>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
       {/* Title Issues */}
       {data.titleIssues && data.titleIssues.length > 0 && (
@@ -402,13 +264,13 @@ function StarterWorkspace({ starterJson, parcelId, county, state, onBack }: Star
             Title Issues ({data.titleIssues.length})
           </Typography>
           <Divider sx={{ mb: 2 }} />
-          <Grid container spacing={2}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(3, 1fr)' }, gap: 2 }}>
             {data.titleIssues.map((issue: any, idx: number) => {
               const isPrimitive = typeof issue === 'string' || typeof issue === 'number'
               const title = isPrimitive ? String(issue) : issue.issueType || JSON.stringify(issue)
               const severity = isPrimitive ? '' : (issue.severity || '')
               return (
-                <Grid item xs={12} sm={6} md={4} key={idx}>
+                <Box key={idx}>
                   <Card
                     sx={{
                       bgcolor: '#ffffff',
@@ -434,10 +296,10 @@ function StarterWorkspace({ starterJson, parcelId, county, state, onBack }: Star
                       <Typography variant="caption" sx={{ color: '#3b82f6', fontWeight: 600 }}>Click for details →</Typography>
                     </CardContent>
                   </Card>
-                </Grid>
+                </Box>
               )
             })}
-          </Grid>
+          </Box>
         </Box>
       )}
 
@@ -449,13 +311,13 @@ function StarterWorkspace({ starterJson, parcelId, county, state, onBack }: Star
             Documents & Records
           </Typography>
           <Divider sx={{ mb: 2 }} />
-          <Grid container spacing={2} alignItems="stretch">
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(3, 1fr)' }, gap: 2, alignItems: 'stretch' }}>
             {orderedStarterDocs.map(([key, val]) => (
-              <Grid item xs={12} sm={6} md={4} key={key} sx={{ display: 'flex' }}>
+              <Box key={key} sx={{ display: 'flex' }}>
                 {renderDocumentCard(key, val)}
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         </Box>
       )}
 

@@ -19,7 +19,9 @@ namespace WebApplication1.Repositories.implementations.PropertyStarer
 
             if(parcel == null)
             {
+                Console.WriteLine(_context.Database.GetConnectionString());
                 return null;
+              
             }
             StarterPackage starterPackage = null;
             List<StarterIssue> stareterIssue = new();
