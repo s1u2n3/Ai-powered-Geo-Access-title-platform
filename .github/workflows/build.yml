@@ -1,4 +1,4 @@
-name: Build Docker Images
+name: Build and Push Images
 
 on:
   push:
@@ -9,12 +9,48 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      AWS_REGION: eu-north-1
+      AWS_ACCOUNT_ID: 755035179764
+
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
       - name: Build API Image
-        run: docker build -t api-image ./WebApplication1
+        run: |
+          docker build -t geoaccess-api ./WebApplication1
+          docker tag geoaccess-api:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/geoaccess-api:latest
+
+      - name: Push API Image
+        run: |
+          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/geoaccess-api:latest
 
       - name: Build UI Image
-        run: docker build -t ui-image ./Ui
+        run: |
+          docker build -t geoaccess-ui ./Ui
+          docker tag geoaccess-ui:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/geoaccess-ui:latest
+
+      - name: Push UI Image
+        run: |
+          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/geoaccess-ui:latest
+
+      - name: Build Postgres Image
+        run: |
+          docker build -t geoaccess-postgres ./postgres
+          docker tag geoaccess-postgres:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/geoaccess-postgres:latest
+
+      - name: Push Postgres Image
+        run: |
+          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/geoaccess-postgres:latest
