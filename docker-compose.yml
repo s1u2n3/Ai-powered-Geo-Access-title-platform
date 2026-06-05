@@ -19,6 +19,25 @@ services:
 
     restart: unless-stopped
 
+  sqlserver:
+     image: mcr.microsoft.com/mssql/server:2022-latest
+
+     container_name: sqlserver-db
+
+     environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "ivar.,.@123S"
+
+     ports:
+      - "1433:1433"
+
+     volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./sqlserver/backup:/backup
+
+     restart: unless-stopped  
+    
+
   api:
     build:
       context: ./WebApplication1
@@ -32,6 +51,7 @@ services:
       - "8080:8080"
 
     depends_on:
+      - sqlserver
       - postgres
 
     restart: unless-stopped
@@ -54,3 +74,5 @@ volumes:
   postgres_data:
     external: true
     name: ai-power-accesscontrolsystem_postgres_data
+
+  sqlserver_data:
