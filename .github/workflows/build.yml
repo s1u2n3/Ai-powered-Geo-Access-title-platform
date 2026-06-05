@@ -1,0 +1,20 @@
+name: Build Docker Images
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Build API Image
+        run: docker build -t api-image ./WebApplication1
+
+      - name: Build UI Image
+        run: docker build -t ui-image ./Ui
