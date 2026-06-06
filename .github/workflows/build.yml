@@ -61,18 +61,23 @@ jobs:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-           aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 755035179764.dkr.ecr.eu-north-1.amazonaws.com
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+         aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 755035179764.dkr.ecr.eu-north-1.amazonaws.com
 
-           docker pull 755035179764.dkr.ecr.eu-north-1.amazonaws.com/geoaccess-api:latest
-           docker pull 755035179764.dkr.ecr.eu-north-1.amazonaws.com/geoaccess-ui:latest
+         docker pull 755035179764.dkr.ecr.eu-north-1.amazonaws.com/geoaccess-api:latest
+         docker pull 755035179764.dkr.ecr.eu-north-1.amazonaws.com/geoaccess-ui:latest
 
-           cd ~/geoaccess
+         docker stop api-test || true
+         docker stop ui-test || true
 
-           docker rm -f api-test || true
-           docker rm -f ui-test || true
+         docker rm api-test || true
+         docker rm ui-test || true
 
-           docker-compose -f docker-compose.prod.yml up -d api ui
+         cd ~/geoaccess
+
+         docker-compose -f docker-compose.prod.yml up -d api ui
+
+         docker image prune -f
