@@ -65,12 +65,14 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 755035179764.dkr.ecr.eu-north-1.amazonaws.com
+           aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 755035179764.dkr.ecr.eu-north-1.amazonaws.com
 
-            docker pull 755035179764.dkr.ecr.eu-north-1.amazonaws.com/geoaccess-api:latest
-            docker pull 755035179764.dkr.ecr.eu-north-1.amazonaws.com/geoaccess-ui:latest
-            docker pull 755035179764.dkr.ecr.eu-north-1.amazonaws.com/geoaccess-postgres:latest
+           docker pull 755035179764.dkr.ecr.eu-north-1.amazonaws.com/geoaccess-api:latest
+           docker pull 755035179764.dkr.ecr.eu-north-1.amazonaws.com/geoaccess-ui:latest
 
-            cd ~/geoaccess
+           cd ~/geoaccess
 
-            docker-compose -f docker-compose.prod.yml up -d
+           docker rm -f api-test || true
+           docker rm -f ui-test || true
+
+           docker-compose -f docker-compose.prod.yml up -d api ui
