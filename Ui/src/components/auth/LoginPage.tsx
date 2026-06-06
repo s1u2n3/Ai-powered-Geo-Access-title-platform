@@ -1,5 +1,7 @@
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
-import type { FormEvent } from 'react'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
+import { useState, type FormEvent } from 'react'
 import {
   Avatar,
   Box,
@@ -8,6 +10,8 @@ import {
   CardContent,
   Container,
   Divider,
+  IconButton,
+  InputAdornment,
   TextField,
   Typography,
 } from '@mui/material'
@@ -31,6 +35,8 @@ function LoginPage({
   onPasswordChange,
   onSubmit,
 }: LoginPageProps) {
+  const [showPassword, setShowPassword] = useState(false)
+
   return (
     <Box
       sx={{
@@ -94,12 +100,29 @@ function LoginPage({
               />
               <TextField
                 label="Password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(event) => onPasswordChange(event.target.value)}
                 fullWidth
                 required
                 disabled={loading}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label={showPassword ? 'Hide password' : 'Show password'}
+                          onClick={() => setShowPassword((current) => !current)}
+                          onMouseDown={(event) => event.preventDefault()}
+                          edge="end"
+                          disabled={loading}
+                        >
+                          {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
               />
               <Button type="submit" variant="contained" size="large" disabled={loading}>
                 {loading ? 'Signing in…' : 'Continue'}
