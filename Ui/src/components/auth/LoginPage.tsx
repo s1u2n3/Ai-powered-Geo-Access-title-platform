@@ -66,7 +66,7 @@ function LoginPage({
             }}
           >
             <Typography variant="h4" sx={{ color: '#f8fafc', fontWeight: 700 }}>
-              Secure Client Access
+              Secure Client Access cicd test
             </Typography>
             <Typography variant="body1" sx={{ color: 'rgba(248, 250, 252, 0.84)', maxWidth: 520 }}>
               Sign in to access your property search, documents, geo controls, and profile tools in a professional portal.
