@@ -37,6 +37,10 @@ jobs:
         run: |
           docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/geoaccess-api:latest
 
+      - name: Create UI Environment File
+        run: |
+          echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" > Ui/.env.production
+
       - name: Build UI Image
         run: |
           docker build -t geoaccess-ui ./Ui
