@@ -58,7 +58,7 @@ jobs:
       - name: Push Postgres Image
         run: |
           docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/geoaccess-postgres:latest
-           - name: Test EC2 SSH Connection
+      - name: Test EC2 SSH Connection
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
