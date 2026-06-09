@@ -27,23 +27,53 @@ interface StarterWorkspaceProps {
   onBack?: () => void
 }
 
-function StarterWorkspace({ starterJson = '{}', parcelId, county, state, onBack = () => {} }: StarterWorkspaceProps) {
+function StarterWorkspace({ starterJson = '{}', parcelId, county, state, onBack }: StarterWorkspaceProps) {
   const [selectedIssue, setSelectedIssue] = useState<any>(null)
   const [selectedFact, setSelectedFact] = useState<any>(null)
   
   let data: any
   try {
-    data = JSON.parse(starterJson)
+    const storedStarterJson = window.localStorage.getItem('adminStarterJson')
+    const resolvedStarterJson = starterJson !== '{}' ? starterJson : storedStarterJson || '{}'
+    data = JSON.parse(resolvedStarterJson)
   } catch (error) {
     return (
       <Box sx={{ p: 3 }}>
-        <Button startIcon={<ArrowBackIcon />} onClick={onBack} sx={{ mb: 2 }}>
-          Back
-        </Button>
+        {onBack && (
+          <Button startIcon={<ArrowBackIcon />} onClick={onBack} sx={{ mb: 2 }}>
+            Back
+          </Button>
+        )}
         <Alert severity="error">Invalid Starter JSON data</Alert>
       </Box>
     )
   }
+
+  const hasValue = (value: any) => value !== null && value !== undefined && value !== ''
+  const displayValue = (value: any) => {
+    if (!hasValue(value)) {
+      return ''
+    }
+
+    if (typeof value === 'object') {
+      return JSON.stringify(value)
+    }
+
+    return String(value)
+  }
+
+  const isParcelSummaryStarter = Boolean(data.parcelSummary || data.ownership || data.encumbrances)
+
+  const renderInfoRows = (rows: Array<{ label: string; value: any }>) => (
+    <Box sx={{ display: 'grid', gap: 1 }}>
+      {rows.filter((row) => hasValue(row.value)).map((row) => (
+        <Box key={row.label} sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, py: 0.35 }}>
+          <Typography variant="body2" sx={{ color: '#475569' }}>{row.label}</Typography>
+          <Typography variant="body2" sx={{ fontWeight: 800, textAlign: 'right' }}>{displayValue(row.value)}</Typography>
+        </Box>
+      ))}
+    </Box>
+  )
 
   const getSeverityColor = (severity: string) => {
     switch (severity?.toUpperCase()) {
@@ -170,11 +200,131 @@ function StarterWorkspace({ starterJson = '{}', parcelId, county, state, onBack 
 
 
 
+  if (isParcelSummaryStarter) {
+    const parcelSummary = data.parcelSummary || {}
+    const ownership = data.ownership || {}
+    const encumbrances = Array.isArray(data.encumbrances) ? data.encumbrances : []
+    const titleId = parcelSummary.surveyNo || parcelId || 'Starter'
+    const karnatakaSummaryItems = [
+      { label: 'Survey No', value: parcelSummary.surveyNo, icon: <DescriptionIcon sx={{ color: '#4338ca' }} /> },
+      { label: 'Village', value: parcelSummary.village, icon: <HomeIcon sx={{ color: '#4338ca' }} /> },
+      { label: 'District / State', value: [parcelSummary.district, parcelSummary.state].filter(Boolean).join(' / '), icon: <HomeIcon sx={{ color: '#4338ca' }} /> },
+      { label: 'Owner', value: ownership.ownerName, icon: <SecurityIcon sx={{ color: '#16a34a' }} />, highlight: true },
+    ].filter((item) => hasValue(item.value))
+
+    const parcelRows = [
+      { label: 'Survey No', value: parcelSummary.surveyNo },
+      { label: 'Hissa No', value: parcelSummary.hissaNo },
+      { label: 'Village', value: parcelSummary.village },
+      { label: 'Hobli', value: parcelSummary.hobli },
+      { label: 'Taluk', value: parcelSummary.taluk },
+      { label: 'District', value: parcelSummary.district },
+      { label: 'State', value: parcelSummary.state },
+      { label: 'Total Area', value: parcelSummary.totalArea },
+      { label: 'Shape Of Plot', value: parcelSummary.shapeOfPlot },
+    ]
+
+    const ownershipRows = [
+      { label: 'Owner Name', value: ownership.ownerName },
+      { label: 'Property Address', value: ownership.propertyAddress },
+      { label: 'Property Type', value: ownership.propertyType },
+    ]
+
+    return (
+      <Box sx={{ p: 3, bgcolor: '#f8fafc', minHeight: '100vh' }}>
+        {onBack && (
+          <Button startIcon={<ArrowBackIcon />} onClick={onBack} sx={{ mb: 3 }}>
+            Back to Property Search
+          </Button>
+        )}
+
+        <Typography variant="h4" sx={{ fontWeight: 800, mb: 2 }}>
+          Starter Workspace - {titleId}
+        </Typography>
+        <Typography variant="subtitle1" sx={{ color: '#475569', mb: 4 }}>
+          Overview of parcel summary, ownership, and encumbrance records.
+        </Typography>
+
+        {karnatakaSummaryItems.length > 0 && (
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: `repeat(${Math.min(karnatakaSummaryItems.length, 4)}, 1fr)` }, gap: 2, mb: 3 }}>
+            {karnatakaSummaryItems.map((item) => (
+              <Card key={item.label} sx={{ bgcolor: item.highlight ? '#ecfdf5' : '#ffffff', border: '1px solid rgba(15,23,42,0.08)', minHeight: 120 }}>
+                <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 42, height: 42, borderRadius: 1, bgcolor: item.highlight ? '#dcfce7' : '#eef2ff' }}>
+                    {item.icon}
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" sx={{ color: '#64748b', display: 'block', mb: 0.5 }}>
+                      {item.label}
+                    </Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 700, color: item.highlight ? '#166534' : '#0f172a' }}>
+                      {displayValue(item.value)}
+                    </Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+        )}
+
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, mb: 4 }}>
+          <Card sx={{ border: '1px solid rgba(15,23,42,0.08)', minHeight: 220 }}>
+            <CardContent>
+              <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>Parcel Summary</Typography>
+              <Divider sx={{ mb: 2 }} />
+              {renderInfoRows(parcelRows)}
+            </CardContent>
+          </Card>
+
+          <Card sx={{ border: '1px solid rgba(15,23,42,0.08)', minHeight: 220 }}>
+            <CardContent>
+              <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>Ownership</Typography>
+              <Divider sx={{ mb: 2 }} />
+              {renderInfoRows(ownershipRows)}
+            </CardContent>
+          </Card>
+        </Box>
+
+        {encumbrances.length > 0 && (
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="h6" sx={{ fontWeight: 800, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <DescriptionIcon sx={{ color: '#4338ca' }} />
+              Encumbrances
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 2 }}>
+              {encumbrances.map((encumbrance: any, idx: number) => (
+                <Card key={encumbrance.ecNo || idx} sx={{ border: '1px solid rgba(15,23,42,0.08)' }}>
+                  <CardContent>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 1 }}>
+                      {encumbrance.ecNo || `Encumbrance ${idx + 1}`}
+                    </Typography>
+                    <Divider sx={{ mb: 2 }} />
+                    {renderInfoRows([
+                      { label: 'Form Type', value: encumbrance.formType },
+                      { label: 'Period Covered', value: encumbrance.periodCovered },
+                      { label: 'Issued By', value: encumbrance.issuedBy },
+                      { label: 'Date Of Issue', value: encumbrance.dateOfIssue },
+                      { label: 'Applied By', value: encumbrance.appliedBy },
+                      { label: 'Property', value: encumbrance.property },
+                    ])}
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
+          </Box>
+        )}
+      </Box>
+    )
+  }
+
   return (
     <Box sx={{ p: 3, bgcolor: '#f8fafc', minHeight: '100vh' }}>
-      <Button startIcon={<ArrowBackIcon />} onClick={onBack} sx={{ mb: 3 }}>
-        Back to Property Search
-      </Button>
+      {onBack && (
+        <Button startIcon={<ArrowBackIcon />} onClick={onBack} sx={{ mb: 3 }}>
+          Back to Property Search
+        </Button>
+      )}
 
       <Typography variant="h4" sx={{ fontWeight: 800, mb: 2 }}>
         Starter Workspace - {data.parcelId || parcelId || 'Unknown Parcel'}

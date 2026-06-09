@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import LoginPage from './components/auth/LoginPage'
+import ActivateClient from './components/auth/ActivateClient'
 import DashboardRoutes from './components/dashboard/DashboardRoutes'
 import { loginAdmin, type AdminLoginResponse } from './api/auth'
 
@@ -89,19 +91,37 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      {!auth ? (
-        <LoginPage
-          email={email}
-          password={password}
-          message={message}
-          loading={loading}
-          onEmailChange={(value) => setEmail(value)}
-          onPasswordChange={(value) => setPassword(value)}
-          onSubmit={handleSubmit}
-        />
-      ) : (
-        <DashboardRoutes auth={auth} onLogout={logout} />
-      )}
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={
+            !auth ? (
+              <LoginPage
+                email={email}
+                password={password}
+                message={message}
+                loading={loading}
+                onEmailChange={(value) => setEmail(value)}
+                onPasswordChange={(value) => setPassword(value)}
+                onSubmit={handleSubmit}
+              />
+            ) : (
+              <Navigate to={auth.userType?.toLowerCase() === 'user' ? '/admin/create-client-users' : '/client/clientdashboard'} replace />
+            )
+          } />
+          <Route path="/activate-account" element={<ActivateClient onActivated={(authData) => setAuth(authData)} />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route
+            path="*"
+            element={
+              !auth ? (
+                <Navigate to="/login" replace />
+              ) : (
+                <DashboardRoutes auth={auth} onLogout={logout} />
+              )
+            }
+          />
+        </Routes>
+      </BrowserRouter>
     </ThemeProvider>
   )
 }

@@ -26,19 +26,28 @@ import PublicIcon from '@mui/icons-material/Public'
 import PersonIcon from '@mui/icons-material/Person'
 import LogoutIcon from '@mui/icons-material/Logout'
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import GroupAddIcon from '@mui/icons-material/GroupAdd'
+import ContentCutIcon from '@mui/icons-material/ContentCut'
+import UploadFileIcon from '@mui/icons-material/UploadFile'
 import { useClient } from '../../contexts'
 import { fetchClientDetails } from '../../api/client'
 import type { AdminLoginResponse } from '../../api/auth'
 
 const drawerWidth = 280
 
-const tabs = [
+const clientTabs = [
   { path: '/client/clientdashboard', label: 'Client Dashboard', icon: <AccountBoxIcon /> },
   { path: '/client/property', label: 'Property Search', icon: <SearchIcon /> },
   { path: '/client/workspace', label: 'Starter Workspace', icon: <WorkspacePremiumIcon /> },
   { path: '/client/documents', label: 'Documents', icon: <DescriptionIcon /> },
   { path: '/client/geo', label: 'Geo Access', icon: <PublicIcon /> },
   { path: '/client/profile', label: 'Profile', icon: <PersonIcon /> },
+]
+
+const adminTabs = [
+  { path: '/admin/create-client-users', label: 'Create Client Users', icon: <GroupAddIcon /> },
+  { path: '/admin/document-chunk', label: 'Document Chunk', icon: <ContentCutIcon /> },
+  { path: '/admin/load-full-starter', label: 'Load Full Starter', icon: <UploadFileIcon /> },
 ]
 
 interface DashboardShellProps {
@@ -50,14 +59,21 @@ function DashboardShell({ auth, onLogout }: DashboardShellProps) {
   const theme = useTheme()
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'))
   const location = useLocation()
+  const isAdminUser = auth.userType?.toLowerCase() === 'user'
+  const activeTabs = isAdminUser ? adminTabs : clientTabs
   const isPropertySearch = location.pathname === '/client/property'
-  const currentTab = tabs.find((tab) => tab.path === location.pathname)
+  const currentTab = activeTabs.find((tab) => tab.path === location.pathname)
   const [mobileOpen, setMobileOpen] = React.useState(false)
   const { setClientDetails, setLoadingDetails, setSelectedCompanyId, setSelectedBranchId } =
     useClient()
 
   // Fetch client details on mount
   useEffect(() => {
+    if (isAdminUser) {
+      setLoadingDetails(false)
+      return
+    }
+
     const loadClientDetails = async () => {
       try {
         const details = await fetchClientDetails()
@@ -77,7 +93,7 @@ function DashboardShell({ auth, onLogout }: DashboardShellProps) {
     }
 
     loadClientDetails()
-  }, [setClientDetails, setLoadingDetails, setSelectedCompanyId, setSelectedBranchId])
+  }, [isAdminUser, setClientDetails, setLoadingDetails, setSelectedCompanyId, setSelectedBranchId])
 
   const drawerContent = (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -96,7 +112,7 @@ function DashboardShell({ auth, onLogout }: DashboardShellProps) {
       <Divider />
 
       <List sx={{ flexGrow: 1 }}>
-        {tabs.map((tab) => (
+        {clientTabs.map((tab) => (
           <ListItemButton
             key={tab.path}
             component={NavLink}
@@ -137,87 +153,210 @@ function DashboardShell({ auth, onLogout }: DashboardShellProps) {
         position="fixed"
         elevation={0}
         sx={{
-          width: { md: `calc(100% - ${drawerWidth}px)` },
-          ml: { md: `${drawerWidth}px` },
+          width: { md: isAdminUser ? '100%' : `calc(100% - ${drawerWidth}px)` },
+          ml: { md: isAdminUser ? 0 : `${drawerWidth}px` },
           background: 'rgba(255,255,255,0.92)',
           color: '#111827',
           backdropFilter: 'blur(12px)',
           borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
         }}
       >
-        <Toolbar sx={{ justifyContent: 'space-between', minHeight: 84 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {!isDesktop && (
+        <Toolbar sx={{ justifyContent: 'space-between', minHeight: isAdminUser ? 58 : 84, gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, flexShrink: 0 }}>
+            {!isDesktop && !isAdminUser && (
               <IconButton edge="start" color="inherit" onClick={() => setMobileOpen(true)}>
                 <MenuIcon />
               </IconButton>
             )}
-            <Typography component="h2" variant="h6" sx={{ fontWeight: 700 }} noWrap>
-              {currentTab?.label || (auth.userType === 'Client' ? 'Client Dashboard' : 'Admin Dashboard')}
-            </Typography>
+            {isAdminUser ? (
+              <>
+                <Box
+                  sx={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: 2,
+                    display: 'grid',
+                    placeItems: 'center',
+                    color: '#ffffff',
+                    background: 'linear-gradient(135deg, #635bff, #7c3aed)',
+                  }}
+                >
+                  <GroupAddIcon sx={{ fontSize: 18 }} />
+                </Box>
+                <Typography component="h2" variant="subtitle1" sx={{ fontWeight: 900 }} noWrap>
+                  GeoAccess
+                </Typography>
+              </>
+            ) : (
+              <Typography component="h2" variant="h6" sx={{ fontWeight: 700 }} noWrap>
+                {currentTab?.label || 'Client Dashboard'}
+              </Typography>
+            )}
           </Box>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Typography color="text.secondary" variant="body2">
-              Signed in as {auth.emailId}
-            </Typography>          
+          {isAdminUser && (
+            <Box
+              sx={{
+                display: { xs: 'none', md: 'flex' },
+                alignItems: 'center',
+                gap: 0,
+                flex: 1,
+                alignSelf: 'stretch',
+              }}
+            >
+              {adminTabs.map((tab) => (
+                <Button
+                  key={tab.path}
+                  component={NavLink}
+                  to={tab.path}
+                  startIcon={tab.icon}
+                  sx={{
+                    color: location.pathname === tab.path ? 'primary.main' : 'text.secondary',
+                    bgcolor: location.pathname === tab.path ? 'rgba(99, 91, 255, 0.14)' : 'transparent',
+                    borderRadius: 0,
+                    minWidth: 150,
+                    fontWeight: 800,
+                    px: 2,
+                    borderLeft: '1px solid rgba(15, 23, 42, 0.06)',
+                    borderRight: '1px solid rgba(15, 23, 42, 0.03)',
+                    '&:hover': {
+                      bgcolor: 'rgba(99, 91, 255, 0.1)',
+                    },
+                  }}
+                >
+                  {tab.label}
+                </Button>
+              ))}
+            </Box>
+          )}
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: isAdminUser ? 1.5 : 2, flexShrink: 0 }}>
+            {isAdminUser && (
+              <Box
+                sx={{
+                  display: { xs: 'none', lg: 'block' },
+                  border: '1px solid rgba(15, 23, 42, 0.1)',
+                  borderRadius: 1.5,
+                  px: 2,
+                  py: 0.75,
+                  minWidth: 180,
+                }}
+              >
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1 }}>
+                  Workspace
+                </Typography>
+                <Typography variant="caption" sx={{ fontWeight: 800, color: '#0f172a' }}>
+                  Super Admin Workspace
+                </Typography>
+              </Box>
+            )}
+            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+              <Typography color="text.secondary" variant="caption" sx={{ display: 'block', lineHeight: 1 }}>
+                Signed in as
+              </Typography>
+              <Typography variant="caption" sx={{ fontWeight: 800, color: '#0f172a' }}>
+                {auth.emailId}
+              </Typography>
+            </Box>
+            {isAdminUser && (
+              <Box sx={{ position: 'relative', width: 28, height: 28, borderRadius: '50%', bgcolor: '#ede9fe', color: '#6d28d9', display: 'grid', placeItems: 'center', fontWeight: 900, fontSize: 13 }}>
+                {auth.name?.charAt(0) || 'A'}
+                <Box sx={{ position: 'absolute', right: -1, bottom: 0, width: 8, height: 8, borderRadius: '50%', bgcolor: '#22c55e', border: '2px solid #ffffff' }} />
+              </Box>
+            )}
+            <Button variant="outlined" size="small" startIcon={<LogoutIcon />} onClick={onLogout} sx={{ fontWeight: 800 }}>
+              Sign out
+            </Button>
           </Box>
         </Toolbar>
+        {isAdminUser && (
+          <Box
+            sx={{
+              display: { xs: 'flex', md: 'none' },
+              gap: 1,
+              px: 2,
+              pb: 1.5,
+              overflowX: 'auto',
+              borderTop: '1px solid rgba(15, 23, 42, 0.06)',
+            }}
+          >
+            {adminTabs.map((tab) => (
+              <Button
+                key={tab.path}
+                component={NavLink}
+                to={tab.path}
+                startIcon={tab.icon}
+                size="small"
+                sx={{
+                  flexShrink: 0,
+                  color: location.pathname === tab.path ? 'primary.main' : 'text.secondary',
+                  bgcolor: location.pathname === tab.path ? 'rgba(79, 70, 229, 0.12)' : 'transparent',
+                  fontWeight: 800,
+                }}
+              >
+                {tab.label}
+              </Button>
+            ))}
+          </Box>
+        )}
       </AppBar>
 
-      <Box component="nav" sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}>
-        {isDesktop ? (
-          <Drawer
-            variant="permanent"
-            open
-            sx={{
-              '& .MuiDrawer-paper': {
-                width: drawerWidth,
-                boxSizing: 'border-box',
-                borderRight: '1px solid rgba(15, 23, 42, 0.08)',
-                boxShadow: '0 50px 120px rgba(15,23,42,0.08)',
-              },
-            }}
-          >
-            {drawerContent}
-          </Drawer>
-        ) : (
-          <Drawer
-            variant="temporary"
-            open={mobileOpen}
-            onClose={() => setMobileOpen(false)}
-            ModalProps={{ keepMounted: true }}
-            sx={{
-              '& .MuiDrawer-paper': {
-                width: drawerWidth,
-                boxSizing: 'border-box',
-              },
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', px: 2, py: 1, justifyContent: 'space-between' }}>
-              <Typography component="div" variant="subtitle1" sx={{ fontWeight: 700 }}>
-                Menu
-              </Typography>
-              <IconButton onClick={() => setMobileOpen(false)}>
-                <ChevronLeftIcon />
-              </IconButton>
-            </Box>
-            {drawerContent}
-          </Drawer>
-        )}
-      </Box>
+      {!isAdminUser && (
+        <Box component="nav" sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}>
+          {isDesktop ? (
+            <Drawer
+              variant="permanent"
+              open
+              sx={{
+                '& .MuiDrawer-paper': {
+                  width: drawerWidth,
+                  boxSizing: 'border-box',
+                  borderRight: '1px solid rgba(15, 23, 42, 0.08)',
+                  boxShadow: '0 50px 120px rgba(15,23,42,0.08)',
+                },
+              }}
+            >
+              {drawerContent}
+            </Drawer>
+          ) : (
+            <Drawer
+              variant="temporary"
+              open={mobileOpen}
+              onClose={() => setMobileOpen(false)}
+              ModalProps={{ keepMounted: true }}
+              sx={{
+                '& .MuiDrawer-paper': {
+                  width: drawerWidth,
+                  boxSizing: 'border-box',
+                },
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', px: 2, py: 1, justifyContent: 'space-between' }}>
+                <Typography component="div" variant="subtitle1" sx={{ fontWeight: 700 }}>
+                  Menu
+                </Typography>
+                <IconButton onClick={() => setMobileOpen(false)}>
+                  <ChevronLeftIcon />
+                </IconButton>
+              </Box>
+              {drawerContent}
+            </Drawer>
+          )}
+        </Box>
+      )}
 
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          p: isPropertySearch ? 0 : 4,
-          width: { md: `calc(100% - ${drawerWidth}px)` },
+          p: isAdminUser ? 0 : isPropertySearch ? 0 : 4,
+          width: { md: isAdminUser ? '100%' : `calc(100% - ${drawerWidth}px)` },
         }}
       >
         <Toolbar />
+        {isAdminUser && <Toolbar sx={{ display: { xs: 'block', md: 'none' }, minHeight: 36 }} />}
         {/* Hide the welcome banner on the Property Search page to match design */}
-        {!isPropertySearch && (
+        {!isAdminUser && !isPropertySearch && (
           <Box
             sx={{
               mb: 3,
@@ -231,7 +370,9 @@ function DashboardShell({ auth, onLogout }: DashboardShellProps) {
               Welcome back, {auth.name}
             </Typography>
             <Typography color="text.secondary">
-              Your client portal gives you immediate access to property search, workspace collaboration, documents, and geo access.
+              {isAdminUser
+                ? 'Your admin portal gives you access to client users, document chunking, full starter loading, and workspace review.'
+                : 'Your client portal gives you immediate access to property search, workspace collaboration, documents, and geo access.'}
             </Typography>
           </Box>
         )}
@@ -239,10 +380,10 @@ function DashboardShell({ auth, onLogout }: DashboardShellProps) {
         <Box
           sx={{
             minHeight: '62vh',
-            p: isPropertySearch ? 0 : 4,
-            borderRadius: isPropertySearch ? 0 : 4,
-            background: isPropertySearch ? 'transparent' : '#ffffff',
-            boxShadow: isPropertySearch ? 'none' : '0 40px 100px rgba(15,23,42,0.08)',
+            p: isAdminUser ? 0 : isPropertySearch ? 0 : 4,
+            borderRadius: isAdminUser || isPropertySearch ? 0 : 4,
+            background: isAdminUser || isPropertySearch ? 'transparent' : '#ffffff',
+            boxShadow: isAdminUser || isPropertySearch ? 'none' : '0 40px 100px rgba(15,23,42,0.08)',
           }}
         >
           <Outlet />
