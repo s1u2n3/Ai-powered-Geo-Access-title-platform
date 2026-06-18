@@ -18,7 +18,7 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material'
-import { activateClient, type ActivateClientPayload } from '../../api/client'
+import { activateClient, } from '../../api/client'
 import type { AdminLoginResponse } from '../../api/auth'
 
 interface ActivateClientProps {
