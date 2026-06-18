@@ -1,20 +1,36 @@
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Slider,
-  TextField,
-  Typography,
-} from '@mui/material'
-import CloudUploadIcon from '@mui/icons-material/CloudUpload'
+import { useState } from 'react'
+import { Alert, Box, Button, Card, CardContent, CircularProgress, TextField, Typography } from '@mui/material'
 import ContentCutIcon from '@mui/icons-material/ContentCut'
+import { processDocumentChunks } from '../../../api/document'
 
 function DocumentChunk() {
+  const [parcelId, setParcelId] = useState('')
+  const [error, setError] = useState('')
+  const [result, setResult] = useState<{ jobId: string; message: string } | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  const handleProcess = async () => {
+    const trimmed = parcelId.trim()
+    setError('')
+    setResult(null)
+
+    if (!trimmed) {
+      setError('Please enter a Parcel ID to continue.')
+      return
+    }
+
+    setLoading(true)
+    try {
+      const response = await processDocumentChunks(trimmed)
+      setResult({ jobId: response.JobId, message: response.Message })
+    } catch (err) {
+      setError('Failed to start document chunk processing. Please try again.')
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <Box sx={{ display: 'grid', gap: 3 }}>
       <Box>
@@ -22,56 +38,32 @@ function DocumentChunk() {
           Document Chunk
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-          Prepare uploaded document text for indexing and AI search.
+          Start document chunking by entering a Parcel ID and creating a processing job.
         </Typography>
       </Box>
 
       <Card sx={{ borderRadius: 2, border: '1px solid rgba(15,23,42,0.08)', boxShadow: '0 18px 45px rgba(15,23,42,0.06)' }}>
-        <CardContent sx={{ p: 3 }}>
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, mb: 3 }}>
-            <TextField label="Document Name" size="small" fullWidth />
-            <FormControl size="small" fullWidth>
-              <InputLabel id="document-type-label">Document Type</InputLabel>
-              <Select labelId="document-type-label" label="Document Type" defaultValue="Encumbrance Certificate">
-                <MenuItem value="Encumbrance Certificate">Encumbrance Certificate</MenuItem>
-                <MenuItem value="Sale Deed">Sale Deed</MenuItem>
-                <MenuItem value="Mortgage Deed">Mortgage Deed</MenuItem>
-                <MenuItem value="KYC">KYC</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-
-          <Button variant="outlined" component="label" startIcon={<CloudUploadIcon />} sx={{ mb: 3 }}>
-            Upload Document
-            <input hidden type="file" />
-          </Button>
-
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3, mb: 3 }}>
-            <Box>
-              <Typography variant="body2" sx={{ fontWeight: 700, mb: 1 }}>
-                Chunk Size
-              </Typography>
-              <Slider defaultValue={800} step={100} min={200} max={2000} valueLabelDisplay="auto" />
-            </Box>
-            <Box>
-              <Typography variant="body2" sx={{ fontWeight: 700, mb: 1 }}>
-                Overlap
-              </Typography>
-              <Slider defaultValue={120} step={20} min={0} max={400} valueLabelDisplay="auto" />
-            </Box>
-          </Box>
-
+        <CardContent sx={{ p: 3, display: 'grid', gap: 2 }}>
           <TextField
-            label="Extracted Text"
-            minRows={8}
-            multiline
+            label="Parcel ID"
+            size="small"
             fullWidth
-            placeholder="Paste document text here to preview chunking."
+            value={parcelId}
+            onChange={(event) => setParcelId(event.target.value)}
+            placeholder="Enter Parcel ID"
           />
 
-          <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-            <Button variant="contained" startIcon={<ContentCutIcon />}>
-              Create Chunks
+          {error && <Alert severity="error">{error}</Alert>}
+          {result && <Alert severity="success">{result.message} (Job ID: {result.jobId})</Alert>}
+
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              variant="contained"
+              startIcon={<ContentCutIcon />}
+              onClick={handleProcess}
+              disabled={loading}
+            >
+              {loading ? <CircularProgress size={20} color="inherit" /> : 'Create Chunk Job'}
             </Button>
           </Box>
         </CardContent>
