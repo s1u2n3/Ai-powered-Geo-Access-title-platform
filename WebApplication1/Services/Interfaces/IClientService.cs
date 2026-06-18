@@ -8,7 +8,7 @@ namespace WebApplication1.Services.Interfaces
     public interface IClientService
     {
         Task<Client> CreateAsync(
-            CreateClientDto dto);
+            CreateClientDto dto, string userid);
 
         Task<ClientResponseDto> GetClientDetailsAsync(ClaimsPrincipal user);
     }

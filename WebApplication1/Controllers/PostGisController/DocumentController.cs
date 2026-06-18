@@ -25,31 +25,40 @@ namespace WebApplication1.Controllers.PostGisController
             _processingService =
                 processingService;
         }
-     
-        [HttpGet("{parcelId}")]
+        [Authorize]
+        [HttpGet("ChunkDocuments{parcelId}")]
         public async Task<IActionResult>
-            GetParcelDocuments(
+            GetParcelDocumentsForchunkings(
                 string parcelId)
         {
-            var documents =
-                await _s3service
-                    .GetParcelDocumentsAsync(
-                        parcelId);
 
-            await _processingService
-                .ProcessParcelDocumentsAsync(
-                    documents);
+            var JobId =  await _processingService.CreateDocumentProcessingJobAsync(parcelId);
 
-             var result =
-                documents.Select(x => new
-                {
-                    DocumentName =
-                        Path.GetFileName(x.Key),
+            return Ok(new
+            {
+                JobId,
+                Message = "Document processing started"
 
-                    S3Key = x.Key
-                });
+            });
+            //var documents =
+            //    await _s3service
+            //        .GetParcelDocumentsAsync(
+            //            parcelId);
 
-            return Ok(result);
+            //await _processingService
+            //    .ProcessParcelDocumentsAsync(
+            //        documents);
+
+            // var result =
+            //    documents.Select(x => new
+            //    {
+            //        DocumentName =
+            //            Path.GetFileName(x.Key),
+
+            //        S3Key = x.Key
+            //    });
+
+            //return Ok(result);
         }
     }
 }

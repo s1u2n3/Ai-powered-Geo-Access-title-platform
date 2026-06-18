@@ -24,13 +24,14 @@ public class CompanyController : ControllerBase
     }
 
     // 🔹 CREATE COMPANY
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateCompanyDto data)
     {
         var result = await _companyService.CreateAsync(data);
         return Ok(result);
     }
-
+    [Authorize]
     [HttpGet("{companyName}")]
     public async Task<IActionResult> GetCompanyDetailsByName( string companyName)
     {

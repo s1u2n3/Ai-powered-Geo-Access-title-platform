@@ -7,6 +7,7 @@ namespace WebApplication1.Repositories.Interfaces
     public interface IBranchRepository
     {
         Task<Branch> CreateBranchAsync(CreateBranch dto);
+        Task<List<BranchResponse>> GetCompanyBasedBranch(string comanyName);
 
     }
 }

@@ -1,4 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using Microsoft.EntityFrameworkCore;
+using MimeKit;
+using System.Runtime.InteropServices;
 using System.Security.Claims;
 using WebApplication1.Dto;
 using WebApplication1.Dto.Client;
@@ -6,6 +11,8 @@ using WebApplication1.entites;
 using WebApplication1.Repositories.Implementations;
 using WebApplication1.Repositories.Interfaces;
 using WebApplication1.Services.Interfaces;
+using WebApplication1.Services.Interfaces.RedisService;
+using WebApplication1.MiddleWare.Exceptions;
 
 namespace WebApplication1.Services.Implementations
 {
@@ -14,32 +21,112 @@ namespace WebApplication1.Services.Implementations
     {
         private readonly IClientRepository
             _repository;
+        private readonly IConfiguration _configuration;
+        private readonly IAuditLogsService _auditlogs;
+        private readonly IRedisService _cache;
 
-        public ClientService(
-            IClientRepository repository)
+
+        public ClientService(IClientRepository repository ,IConfiguration configuration,IAuditLogsService auditlogs,IRedisService cache)
         {
             _repository = repository;
+            _configuration=configuration;
+            _auditlogs=auditlogs;
+            _cache = cache;
         }
 
         public async Task<Client>
-            CreateAsync(CreateClientDto dto)
+            CreateAsync(CreateClientDto dto ,String userId)
         {
             if (string.IsNullOrWhiteSpace(
                 dto.ClientName))
             {
-                throw new Exception(
+                throw new ValidationException(
                     "Client name is required");
             }
 
             if (string.IsNullOrWhiteSpace(
                 dto.Email))
             {
-                throw new Exception(
+                throw new ValidationException(
                     "Email is required");
             }
 
-            return await
-                _repository.CreateAsync(dto);
+
+            var cleint = await _repository.CreateAsync(dto);
+            await SendActivationEmailAsync(cleint.Email, cleint.ClientName, cleint.EmailVerificationToken);
+            await _auditlogs.LogAsync("Create Client", "Client", cleint.Id.ToString(), $"Clint {cleint.ClientName} Created", userId);
+            return cleint;
+        }
+
+        private async Task SendActivationEmailAsync(
+     string email,
+     string clientName,
+     string token)
+        {
+            var host = _configuration["EmailSettings:Host"];
+            var port = Convert.ToInt32(_configuration["EmailSettings:Port"]);
+
+            var username =
+                _configuration["EmailSettings:Username"];
+
+            var password =
+                _configuration["EmailSettings:Password"];
+
+            var fromEmail =
+                _configuration["EmailSettings:FromEmail"];
+
+            var fromName =
+                _configuration["EmailSettings:FromName"];
+
+            var activationLink =
+                $"http://localhost:3000/activate-account?token={token}";
+
+            var message = new MimeMessage();
+
+            message.From.Add(
+                new MailboxAddress(
+                    fromName,
+                    fromEmail));
+
+            message.To.Add(
+                MailboxAddress.Parse(email));
+
+            message.Subject =
+                "Activate Your GeoAccess Account";
+
+            message.Body =
+                new TextPart("html")
+                {
+                    Text = $@"
+                <h2>Welcome {clientName}</h2>
+
+                <p>Your account has been created.</p>
+
+                <p>
+                    <a href='{activationLink}'>
+                        Activate Account
+                    </a>
+                </p>
+
+                <p>
+                    This link expires in 24 hours.
+                </p>"
+                };
+
+            using var smtp = new SmtpClient();
+
+            await smtp.ConnectAsync(
+                host,
+                port,
+                SecureSocketOptions.StartTls);
+
+            await smtp.AuthenticateAsync(
+                username,
+                password);
+
+            await smtp.SendAsync(message);
+
+            await smtp.DisconnectAsync(true);
         }
         public async Task<ClientResponseDto> GetClientDetailsAsync(ClaimsPrincipal user)
         {
@@ -48,15 +135,23 @@ namespace WebApplication1.Services.Implementations
             // FROM JWT TOKEN
 
             var clientId =
-                user.FindFirst("ClientId")
-                ?.Value;
+      user.FindFirst(
+          ClaimTypes.NameIdentifier)
+      ?.Value;
 
             if (string.IsNullOrEmpty(clientId))
             {
-                throw new Exception(
+                throw new UnauthorizedException (
                     "Invalid Client");
             }
 
+            var cachedkey = $"client-details:{clientId}";
+            var cachedData =  await _cache.GetAsync<ClientResponseDto>(cachedkey);
+
+            if(cachedData != null)
+            {
+                return cachedData;
+            }
             // STEP 2
             // FETCH CLIENT
 
@@ -180,8 +275,7 @@ namespace WebApplication1.Services.Implementations
             // STEP 4
             // FINAL RESPONSE
 
-            return new
-                ClientResponseDto
+           var repsonse=new ClientResponseDto
             {
                 ClientId = client.Id,
 
@@ -202,6 +296,10 @@ namespace WebApplication1.Services.Implementations
 
                 Companies = companies
             };
+
+            await _cache.SetAsync(cachedkey, repsonse, TimeSpan.FromDays(7));
+
+            return repsonse;
         }
     }
 }

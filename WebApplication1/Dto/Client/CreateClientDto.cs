@@ -12,6 +12,7 @@
 
         public string PhoneNumber { get; set; }
 
+
         public List<ClientCompanyAccessDto>
             Companies
         { get; set; }

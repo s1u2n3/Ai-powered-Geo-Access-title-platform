@@ -23,5 +23,9 @@ namespace WebApplication1.Services.Implementaions
         {
             return await _repository.CreateBranchAsync(dto);
         }
+        public async Task<List<BranchResponse>> GetComanyBasedBranch(string comanyName)
+        {
+            return await _repository.GetCompanyBasedBranch(comanyName);
+        }
     }
 }

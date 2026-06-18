@@ -2,133 +2,118 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Text;
 using WebApplication1.Dto.Login ;
+using WebApplication1.MiddleWare.Exceptions;
 
 namespace WebApplication1.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    
+
     public class AuthController : ControllerBase
-        
+
 
     {
 
         private readonly IConfiguration _configuration;
         private readonly AppDbContext _context;
 
-        public AuthController(IConfiguration configuration ,AppDbContext context)
+        public AuthController(IConfiguration configuration, AppDbContext context)
         {
             _configuration = configuration;
             _context = context;
-        
+
         }
 
-        [HttpPost("admin-login")]
-        public IActionResult AdminLogin(Login dto)
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(Login dto)
         {
-            if (dto.Email == "admin@test.com"
-                &&
-                dto.Password == "123")
+            // 1. Check Users table first
+          
+
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(x => x.Email == dto.Email);
+
+            if (user != null)
             {
+               
+                                    var isPasswordValid =
+                    BCrypt.Net.BCrypt.Verify(
+                        dto.Password,
+                        user.PasswordHash);
+
+                if (!isPasswordValid)
+                {
+                     throw new UnauthorizedException(
+                     "Invalid credentials");
+                }
+
                 var claims = new[]
                 {
             new Claim(
                 ClaimTypes.Email,
-                dto.Email),
+                user.Email),
 
             new Claim(
                 ClaimTypes.Role,
-                "Admin")
-        };
-                var key =
-                    new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(
-                            _configuration["Jwt:Key"]));
+                user.Role),
 
-
-                var credentials =
-                    new SigningCredentials(
-                        key,
-                        SecurityAlgorithms.HmacSha256);
-                var token =
-                    new JwtSecurityToken(
-                        issuer:
-                            _configuration["Jwt:Issuer"],
-
-                        audience:
-                            _configuration["Jwt:Audience"],
-
-                        claims: claims,
-
-                        expires:
-                            DateTime.UtcNow.AddHours(1),
-
-                        signingCredentials:
-                            credentials);
+            new Claim(
+                ClaimTypes.NameIdentifier,
+                user.Id.ToString()),
            
+            new Claim(
+                "UserType",
+                "User")
+        };
 
-                var jwt =
-                    new JwtSecurityTokenHandler()
-                    .WriteToken(token);
+                var jwt = GenerateJwt(claims);
 
-                return Ok(jwt);
+                return Ok(new
+                {
+                    Token = jwt,
+                    UserType = "User",
+                    Role = user.Role,
+                    UserId = user.Id,
+                    Name = user.Name,
+                    EmailId = user.Email,
+                    Expiration = DateTime.UtcNow.AddHours(1)
+                });
             }
 
-            return Unauthorized(
-                "Invalid Credentials");
-        }
-        [HttpPost("client-login")]
-        public async Task<IActionResult> ClientLogin (Login dto)
-        {
-            // STEP 1
-            // find client in DB
-            var hash =
-BCrypt.Net.BCrypt.HashPassword(
-    "Client123");
+            // 2. Check Clients table
 
-            Console.WriteLine(hash);
-            var client =
-                await _context.Clients
-                .FirstOrDefaultAsync(x =>
-                    x.Email == dto.Email);
+            var client = await _context.Clients
+                .FirstOrDefaultAsync(x => x.Email == dto.Email);
 
-            // STEP 2
-            // check email exists
-
-            if (client == null)
+            if (client != null)
             {
-                return Unauthorized(
-                    "Invalid Email");
-            }
+                var isPasswordValid =
+                    BCrypt.Net.BCrypt.Verify(
+                        dto.Password,
+                        client.PasswordHash);
 
-            // STEP 3
-            // verify password hash
+                if (!isPasswordValid)
+                {
+                    return Unauthorized("Invalid Password");
+                }
 
-            var isPasswordValid =
-                BCrypt.Net.BCrypt.Verify(
-                    dto.Password,
-                    client.PasswordHash);
-
-            if (!isPasswordValid)
-            {
-                return Unauthorized(
-                    "Invalid Password");
-            }
-
-            // STEP 4
-            // create claims
-
-            var claims = new[]
-            {
+                var claims = new[]
+                {
             new Claim(
                 ClaimTypes.Email,
                 client.Email),
 
             new Claim(
-                "ClientId",
+                ClaimTypes.Role,
+                "Client"),
+
+            new Claim(
+                ClaimTypes.NameIdentifier,
                 client.Id.ToString()),
 
             new Claim(
@@ -136,67 +121,116 @@ BCrypt.Net.BCrypt.HashPassword(
                 "Client")
         };
 
-            // STEP 5
-            // create signing key
+                var jwt = GenerateJwt(claims);
 
+                return Ok(new
+                {
+                    Token = jwt,
+                    UserType = "Client",
+                    Role = "Client",
+                    ClientId = client.Id,
+                    Name = client.ClientName,
+                    EmailId = client.Email,
+                    Expiration = DateTime.UtcNow.AddHours(1)
+                });
+            }
+
+            return Unauthorized("Invalid Credentials");
+        }
+        private string GenerateJwt(IEnumerable<Claim> claims)
+        {
             var key =
                 new SymmetricSecurityKey(
                     Encoding.UTF8.GetBytes(
                         _configuration["Jwt:Key"]));
-
-            // STEP 6
-            // signing credentials
 
             var credentials =
                 new SigningCredentials(
                     key,
                     SecurityAlgorithms.HmacSha256);
 
-            // STEP 7
-            // create JWT token
-
             var token =
                 new JwtSecurityToken(
-                    issuer:
-                        _configuration["Jwt:Issuer"],
-
-                    audience:
-                        _configuration["Jwt:Audience"],
-
+                    issuer: _configuration["Jwt:Issuer"],
+                    audience: _configuration["Jwt:Audience"],
                     claims: claims,
+                    expires: DateTime.UtcNow.AddHours(1),
+                    signingCredentials: credentials);
 
-                    expires:
-                        DateTime.UtcNow.AddHours(1),
-
-                    signingCredentials:
-                        credentials);
-
-            // STEP 8
-            // convert token to string
-
-            var jwt =
-                new JwtSecurityTokenHandler()
+            return new JwtSecurityTokenHandler()
                 .WriteToken(token);
+        }
 
-            // STEP 9
-            // return token
+       
+
+        [HttpPost("activate-client")]
+        public async Task<IActionResult> ActivateClient(
+    ActivateRequestDto req)
+        {
+            var client = await _context.Clients
+                .FirstOrDefaultAsync(x =>
+                    x.EmailVerificationToken == req.token);
+
+            if (client == null)
+            {
+                return BadRequest("Client not found");
+            }
+
+            if (req.Password != req.ConfirmPassword)
+            {
+                return BadRequest("Password mismatch");
+            }
+
+            if (client.VerificationTokenExpiry < DateTime.UtcNow)
+            {
+                return BadRequest("Token expired");
+            }
+
+            client.PasswordHash =
+                BCrypt.Net.BCrypt.HashPassword(req.Password);
+
+            client.IsEmailVerified = true;
+
+            client.EmailVerificationToken = null;
+
+            client.VerificationTokenExpiry = null;
+
+            await _context.SaveChangesAsync();
+
+            var claims = new[]
+            {
+        new Claim(
+            ClaimTypes.Email,
+            client.Email),
+
+        new Claim(
+            ClaimTypes.Role,
+            "Client"),
+
+        new Claim(
+            "ClientId",
+            client.Id.ToString()),
+
+        new Claim(
+            "UserType",
+            "Client")
+    };
+
+            var jwt = GenerateJwt(claims);
 
             return Ok(new
             {
                 Token = jwt,
-
                 UserType = "Client",
-
+                Role = "Client",
                 ClientId = client.Id,
-
                 Name = client.ClientName,
-
                 EmailId = client.Email,
-
-                Expiration =
-         DateTime.UtcNow.AddHours(1)
+                Expiration = DateTime.UtcNow.AddHours(1)
             });
         }
+
+
 
     }
 }

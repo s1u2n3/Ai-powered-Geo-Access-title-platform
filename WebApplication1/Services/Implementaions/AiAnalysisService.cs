@@ -1,11 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
+using Microsoft.VisualBasic;
+using NetTopologySuite.Operation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Org.BouncyCastle.Utilities;
+using System.Collections;
+using System.ComponentModel;
+using System.Reflection;
 using System.Text.Json;
+using UglyToad.PdfPig;
 using WebApplication1.Dto.LLM;
+using WebApplication1.entites;
 using WebApplication1.Repositories.implementations;
 using WebApplication1.Services.Interfaces;
+using WebApplication1.Services.Interfaces.AiServices;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 public class AIAnalysisService
@@ -15,13 +25,16 @@ public class AIAnalysisService
         PostgresDbContext _context;
     private readonly HttpClient _httpClient;
     private readonly IStarterRepository _starterRepository;
-        
+    private readonly IVectorSearchInterface _vectorSearchService;
 
-    public AIAnalysisService(PostgresDbContext context ,HttpClient httpClient, IStarterRepository  starterRepository)
+
+
+    public AIAnalysisService(PostgresDbContext context ,HttpClient httpClient, IStarterRepository  starterRepository,IVectorSearchInterface vectorSearchInterface)
     {
         _context = context;
         _httpClient=httpClient;
         _starterRepository = starterRepository;
+        _vectorSearchService = vectorSearchInterface;
     }
 
     public async Task<string>
@@ -29,330 +42,209 @@ public class AIAnalysisService
             string parcelId,
             string question)
      {
-        var chunks =
-            await _context.DocumentChunks
-                .Where(x =>
-                    x.ParcelId == parcelId)
-                .OrderBy(x =>
-                    x.ChunkOrder)
-                
-                .Select(x =>
-                    x.ChunkText)
-                .ToListAsync();
+        //var chunks =
+        //    await _context.DocumentChunks
+        //        .Where(x =>
+        //            x.ParcelId == parcelId)
+        //        .OrderBy(x =>
+        //            x.ChunkOrder)
 
-        var combinedText =
+        //        .Select(x =>
+        //            x.ChunkText)
+        //        .ToListAsync();
+
+        //var combinedText =
+        //    string.Join(
+        //        "\n\n",
+        //        chunks);
+
+        //combinedText =
+        //    SanitizeText(combinedText);
+        var ownershipChunks =
+    await _vectorSearchService
+        .SearchAsync(
+            parcelId,
+        
+            "Identify current owner, previous owners, ownership history, title holders, transfer deeds, sale deeds, inheritance records, gift deeds, mutation entries and ownership changes..");
+
+
+        foreach (var chunk in ownershipChunks)
+        {
+            Console.WriteLine(chunk.Distance);
+        }
+        var litigationChunks =
+            await _vectorSearchService
+                .SearchAsync(
+                    parcelId,
+                    "Identify litigation, court cases, legal disputes, notices and pending proceedings.");
+
+        foreach (var chunk in litigationChunks)
+        {
+            Console.WriteLine(chunk.Distance);
+        }
+
+        var encumbranceChunks =
+            await _vectorSearchService
+                .SearchAsync(
+                    parcelId,
+                    "Identify mortgages, liens, charges, loans and encumbrances.");
+
+        foreach (var chunk in encumbranceChunks)
+        {
+            Console.WriteLine(chunk.Distance);
+        }
+
+
+        var ownershipContext = string.Join(
+     "\n\n",
+     ownershipChunks
+         .DistinctBy(x => x.Chunk.ChunkText)
+         .Select(x => x.Chunk.ChunkText)
+ );
+
+        var litigationContext =
             string.Join(
                 "\n\n",
-                chunks);
+                litigationChunks.DistinctBy(x=>x.Chunk.ChunkText).Select(x =>
+                    x.Chunk.ChunkText));
 
-        combinedText =
-            SanitizeText(combinedText);
-        //        var prompt = $@"
-        //You are a JSON extraction engine.
-        //input
-        //{question}
-
-
-        //Your only task is to extract title information from property documents.
-
-        //IMPORTANT:
-
-        //- Return ONLY valid JSON.
-        //- Do NOT explain.
-        //- Do NOT summarize.
-        //- Do NOT provide recommendations.
-        //- Do NOT provide notes.
-        //- Do NOT provide analysis.
-        //- Do NOT return markdown.
-        //- Do NOT return text before JSON.
-        //- Do NOT return text after JSON.
-        //- Use ONLY information present in the documents.
-        //- Do NOT invent facts.
-        //- Do NOT guess values.
-        //- If information is unavailable use:
-        //  - Empty string """"
-        //  - Empty array []
-
-        //Return EXACTLY this JSON structure:
-
-        //{{
-        //  ""vestingInformation"": {{
-        //    ""currentOwners"": []
-        //  }},
-
-        //  ""taxInformation"": {{
-        //    ""taxStatus"": """"
-        //  }},
-
-        //  ""titleIssues"": [
-        //    {{
-        //      ""issueType"": """",
-        //      ""severity"": """",
-        //      ""description"": """",
-        //      ""recommendedAction"": """"
-        //    }}
-        //  ],
-
-        //  ""riskAssessment"": {{
-        //    ""overallRisk"": """",
-        //    ""riskFactors"": [
-        //      {{
-        //        ""factor"": """",
-        //        ""severity"": """"
-        //      }}
-        //    ]
-        //  }}
-        //}}
-
-        //Extraction Rules:
-
-        //Current Owners:
-        //- Extract from Sale Deeds
-        //- Extract from Mutation Records
-        //- Extract from Khata Extracts
-        //- Extract from Ownership Records
-
-        //Tax Status:
-        //- Extract from Property Tax Receipts
-        //- Extract from Tax Records
-
-        //Title Issues:
-        //Create titleIssues only when supported by evidence.
-
-        //Possible issues:
-        //- Litigation
-        //- Court Case
-        //- Boundary Dispute
-        //- Active Mortgage
-        //- Encumbrance
-        //- Judgment
-        //- Ownership Concern
-        //- Missing Document
-        //- Legal Heir Issue
-
-        //Risk Assessment:
-
-        //LOW:
-        //- No significant issues found
-
-        //MEDIUM:
-        //- Active Mortgage
-        //- Minor Boundary Concern
-        //- Minor Encumbrance
-
-        //HIGH:
-        //- Litigation
-        //- Court Case
-        //- Judgment
-        //- Multiple Significant Issues
-
-        //CRITICAL:
-        //- Severe ownership conflict
-        //- Multiple unresolved major issues
-
-        //Validation Rules:
-
-        //- The response MUST start with {{
-        //- The response MUST end with }}
-        //- Every property must exist.
-        //- Never rename properties.
-        //- Never add properties.
-        //- Never remove properties.
-
-        //Parcel Documents:
-
-        //{combinedText}
-        //"
-
+        var encumbranceContext =
+            string.Join(
+                "\n\n",
+                encumbranceChunks.DistinctBy(x=>x.Chunk.ChunkText).Select(x => x.Chunk.ChunkText));
         var prompt = $@"
-You are a senior Title Insurance Examiner.
-Return exactly one valid JSON object. The response must be parseable by System.Text.Json and contain no text before or after the JSON.
+You are a senior title insurance examiner.
 
-Analyze all property documents.
+Your task is to generate a Starter Package JSON from the provided evidence.
 
-Your goal is to produce:
+IMPORTANT RULES:
 
-1. A mandatory Starter Summary.
-2. Additional document facts.
+1. Return VALID JSON ONLY.
+2. NEVER return markdown.
+3. NEVER return explanations.
+4. NEVER omit any property from the schema.
+5. If evidence is missing, keep the property and use:
 
-Rules:
+   * """" for strings
+   * false for booleans
+   * [] for arrays
+   * {{}} for objects
 
-* Use ONLY document evidence.
-* Do NOT invent facts.
-* Do NOT guess values.
-* Do NOT summarize.
-* Do NOT explain.
-* Do NOT provide notes.
-* Return ONLY valid JSON.
-*All year ranges must be strings.
+6. Use ONLY information present in the evidence.
+7. Do NOT invent facts.
+8. Do NOT infer ownership, litigation, encumbrances, taxes, approvals, or risks without evidence.
+9. Every property in the schema MUST exist even when empty.
+10. titleIssues must contain structured objects.
+11. riskAssessment.overallRisk must always be one of:
+    LOW, MEDIUM, HIGH, CRITICAL.
 
+RISK RULES:
 
+* Active litigation or pending court case = HIGH
+* Boundary dispute = HIGH
+* Active mortgage = MEDIUM
+* Released mortgage with no issues = LOW
+* No significant issues found = LOW
+* Multiple severe title issues = CRITICAL
 
-MANDATORY SECTIONS
+OWNERSHIP EVIDENCE:
 
-Always populate:
+{ownershipContext}
 
-* vestingInformation
-* taxInformation
-* titleIssues
-* riskAssessment
+LITIGATION EVIDENCE:
 
-Even if values are empty.
+{litigationContext}
 
-If information is unavailable:
+ENCUMBRANCE EVIDENCE:
 
-* Use empty string """"
-* Use empty array []
+{encumbranceContext}
 
-TITLE ISSUE RULES
-
-Create titleIssues only when supported by evidence.
-
-Examples:
-
-* Litigation
-* Court Case
-* Judgment
-* Active Mortgage
-* Boundary Dispute
-* Encumbrance
-* Ownership Concern
-* Missing Required Document
-* Legal Heir Concern
-
-RISK RULES
-
-LOW
-
-* Clear ownership
-* Taxes paid
-* No active litigation
-* No active encumbrance
-
-MEDIUM
-
-* Active mortgage
-* Minor title concern
-* Minor encumbrance
-
-HIGH
-
-* Litigation
-* Court case
-* Judgment
-* Ownership concern
-
-CRITICAL
-
-* Ownership conflict
-* Multiple severe issues
-
-ADDITIONAL FACTS
-
-All other information found in documents must be stored inside:
-
-starterFacts
-
-Examples:
-
-* Sale Deed
-* Mortgage Deed
-* Mortgage Release
-* Khata Extract
-* Mutation Register
-* Survey Sketch
-* Building Approval
-* Occupancy Certificate
-* Land Conversion Order
-* Encumbrance Certificate
-* Court Records
-* Legal Heir Affidavit
-* Owner KYC
-* Tax Receipts
-* Any other property-related document
-
-Return EXACTLY this JSON structure:
+RETURN THIS EXACT JSON STRUCTURE:
 
 {{
-""vestingInformation"": {{
-""currentOwners"": []
-}},
+  ""parcelSummary"": {{
+    ""propertyExtent"": """"
+  }},
 
-""taxInformation"": {{
-""taxStatus"": """"
-}},
+  ""ownership"": {{
+    ""currentOwner"": """",
+    ""previousOwners"": [],
+    ""ownershipHistory"": [],
+    ""recordsUpdatedThrough"": """"
+  }},
 
-""titleIssues"": [],
+  ""encumbrances"": {{
+    ""active"": false,
+    ""mortgage"": """",
+    ""status"": """",
+    ""details"": []
+  }},
 
-""riskAssessment"": {{
-""overallRisk"": """",
-""riskFactors"": []
-}},
+  ""litigation"": [
+    {{
+      ""caseNumber"": """",
+      ""court"": """",
+      ""caseType"": """",
+      ""status"": """",
+      ""nextHearing"": """",
+      ""description"": """"
+    }}
+  ],
 
-""starterFacts"": {{}}
+  ""taxInformation"": {{
+    ""paid"": false,
+    ""fy"": """",
+    ""status"": """"
+  }},
+
+  ""approvals"": [],
+
+  ""titleIssues"": [
+    {{
+      ""issueType"": """",
+      ""severity"": """",
+      ""description"": """",
+      ""recommendedAction"": """"
+    }}
+  ],
+
+  ""riskAssessment"": {{
+    ""overallRisk"": ""LOW"",
+    ""riskFactors"": []
+  }},
+
+  ""missingDocuments"": [
+    {{
+      ""type"": """",
+      ""description"": """"
+    }}
+  ],
+
+  ""reviewRecommendations"": [
+    {{
+      ""type"": """",
+      ""description"": """"
+    }}
+  ],
+
+  ""aiObservations"": [
+    {{
+      ""observation"": """"
+    }}
+  ],
+
+  ""starterFacts"": [
+    {{
+      ""category"": """",
+      ""name"": """",
+      ""value"": """"
+    }}
+  ]
 }}
-
-Inside starterFacts:
-
-* Create keys based on document meaning.
-* Preserve important values.
-* Use nested objects where appropriate.
-* Include only facts supported by evidence.
-
-Example:
-
-{{
-""vestingInformation"": {{
-""currentOwners"": [""Priya Sharma""]
-}},
-
-""taxInformation"": {{
-""taxStatus"": ""Paid FY 2025-26""
-}},
-
-""titleIssues"": [],
-
-""riskAssessment"": {{
-""overallRisk"": ""LOW"",
-""riskFactors"": []
-}},
-
-""starterFacts"": {{
-""saleDeed"": {{
-""seller"": ""R Kumar"",
-""buyer"": ""Priya Sharma"",
-""value"": ""9250000""
-}},
-""mortgageRelease"": {{
-""status"": ""Closed""
-}},
-""khataExtract"": {{
-""khataNumber"": ""KH-2218""
-}}
-}}
-}}
-
-CRITICAL:
-
-The response MUST start with {{
-
-The response MUST end with }}
-
-Do not return explanations.
-Do not return notes.
-Do not return markdown.
-
-Return JSON only.
-
-Documents:
-
-{combinedText}
 ";
 
 
 
-
-        Console.WriteLine($"Combined Length: {combinedText.Length}");
 
         var llmResponse =
             await CallLLMAsync(prompt);
@@ -396,10 +288,10 @@ Documents:
 
         var root = JObject.Parse(cleanJson);
 
-       
+
         var currentOwner =
-    root["vestingInformation"]?["currentOwners"]?
-        .FirstOrDefault()?.ToString() ?? "";
+     root["ownership"]?["currentOwner"]?
+         .ToString() ?? "";
         var riskLevel =
     root["riskAssessment"]?["overallRisk"]?
         .ToString() ?? "Low";

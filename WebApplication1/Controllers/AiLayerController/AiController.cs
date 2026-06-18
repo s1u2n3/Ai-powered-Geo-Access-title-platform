@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Dto;
 using WebApplication1.Services.Interfaces;
 
@@ -16,7 +17,7 @@ public class AIController
     {
         _aiService = aiService;
     }
-
+    [Authorize]
     [HttpPost("analyze")]
     public async Task<IActionResult>
         AnalyzeParcel(

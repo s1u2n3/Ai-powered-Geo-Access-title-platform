@@ -7,5 +7,7 @@ namespace WebApplication1.Services.Interfaces
     public interface IBranchService
     {
         Task<Branch> CreateBranchAsync(CreateBranch dto);
+        Task<List<BranchResponse>> GetComanyBasedBranch(string comanyName);
     }
+    
 }

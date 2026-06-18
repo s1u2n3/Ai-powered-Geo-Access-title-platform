@@ -17,6 +17,19 @@ namespace WebApplication1.Repositories.implementations
             _context = context;
         }
 
+        public async Task<List<BranchResponse>>GetCompanyBasedBranch(string companyName){
+
+           return await _context.Branches
+     .Include(b => b.Company)
+     .Where(b => b.Company.Name== companyName)
+         .Select(x => new BranchResponse
+        {
+            Id = x.Id,
+            BranchCode=x.BranchCode
+           
+        })
+        .ToListAsync();
+        }
         public async Task<Branch> CreateBranchAsync(CreateBranch dto) {
 
             var company = await _context.Companies.Include(x => x.CompanyStateCountyAccesses).

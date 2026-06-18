@@ -24,3 +24,5 @@ publish/
 # OS Files
 .DS_Store
 Thumbs.db
+
+docker-compose.dev.yml

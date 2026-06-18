@@ -123,6 +123,78 @@ namespace WebApplication1.Migrations.PostgresDb
                     b.ToTable("parcels");
                 });
 
+            modelBuilder.Entity("WebApplication1.entites.AwsBackgroundJobs.DocumentProcessingItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DocumentName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("DocumentProcessingJobId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("text");
+
+                    b.Property<string>("S3Key")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentProcessingJobId");
+
+                    b.ToTable("DocumentProcessingItem");
+                });
+
+            modelBuilder.Entity("WebApplication1.entites.AwsBackgroundJobs.DocumentProcessingJob", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ParcelId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ProcessedDocuments")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("TotalDocuments")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParcelId");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("DocumentProcessingJob");
+                });
+
             modelBuilder.Entity("WebApplication1.entites.StarterEntities.StarterDocument", b =>
                 {
                     b.Property<int>("Id")
@@ -234,6 +306,17 @@ namespace WebApplication1.Migrations.PostgresDb
                     b.ToTable("StarterPackage");
                 });
 
+            modelBuilder.Entity("WebApplication1.entites.AwsBackgroundJobs.DocumentProcessingItem", b =>
+                {
+                    b.HasOne("WebApplication1.entites.AwsBackgroundJobs.DocumentProcessingJob", "Job")
+                        .WithMany("Items")
+                        .HasForeignKey("DocumentProcessingJobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Job");
+                });
+
             modelBuilder.Entity("WebApplication1.entites.StarterEntities.StarterIssue", b =>
                 {
                     b.HasOne("WebApplication1.entites.StarterEntities.StarterPackage", "StarterPackage")
@@ -243,6 +326,11 @@ namespace WebApplication1.Migrations.PostgresDb
                         .IsRequired();
 
                     b.Navigation("StarterPackage");
+                });
+
+            modelBuilder.Entity("WebApplication1.entites.AwsBackgroundJobs.DocumentProcessingJob", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

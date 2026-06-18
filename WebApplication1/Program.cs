@@ -1,34 +1,44 @@
-using Microsoft.EntityFrameworkCore;
-using WebApplication1.Services.Interfaces;
-//using WebApplication1.Services.Interfaces;
-using WebApplication1.Repositories.implementations;
-using WebApplication1.Repositories.Interfaces;
-using WebApplication1.Services.Implementations;
-using WebApplication1.Seeder;
-using WebApplication1.Services.Implementaions;
-using WebApplication1.Repositories.Implementations;
+using Amazon.SQS;
 //jwt things//
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Microsoft.OpenApi.Models;
-using Pgvector.EntityFrameworkCore;
-
 using NetTopologySuite.IO.Converters;
-using WebApplication1.Repositories.Interfaces.DocumentProcessing;
+using Pgvector.EntityFrameworkCore;
+using System.Text;
+using WebApplication1.Middleware;
+//using WebApplication1.Services.Interfaces;
+using WebApplication1.Repositories.implementations;
 using WebApplication1.Repositories.implementations.DocumentProcessing;
 using WebApplication1.Repositories.implementations.PropertyStarer;
+using WebApplication1.Repositories.Implementations;
+using WebApplication1.Repositories.Interfaces;
+using WebApplication1.Repositories.Interfaces.DocumentProcessing;
+using WebApplication1.Seeder;
+using WebApplication1.Services.Implementaions;
+using WebApplication1.Services.Implementaions.RedisService;
+using WebApplication1.Services.Implementations;
+using WebApplication1.Services.Interfaces;
+using WebApplication1.Services.Interfaces.AiServices;
+using WebApplication1.Services.Interfaces.RedisService;
+using Amazon.Extensions.NETCore.Setup;
+
+
 
 
 var builder = WebApplication.CreateBuilder(args);
 
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>();
 // Add services to the container.
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowUI", policy =>
     {
         policy
-            .WithOrigins("http://13.51.167.99:3000")
+            .WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -114,6 +124,14 @@ builder.Services.AddScoped<IAIAnalysisService,AIAnalysisService>();
 builder.Services.AddScoped<IStarterRepository,StarterRepository>();
 builder.Services.AddScoped<IGeoService, GeoService>();
 builder.Services.AddScoped<IPropertyStarerRepository, PropertyStarterRepository>();
+builder.Services.AddScoped<IVectorSearchInterface,VectorSearchService>();
+builder.Services.AddScoped<IAuditLogsService, AuditLogsService>();
+builder.Services.AddScoped<IRedisService, RedisService>();
+builder.Services.AddScoped<IQueueService, QueueService>();
+
+builder.Services.AddAWSService<IAmazonSQS>();
+builder.Services.AddHostedService<SQSDocumentConsumers>();
+
 //jwt things start//
 var jwtKey =
     builder.Configuration["Jwt:Key"];
@@ -145,6 +163,11 @@ builder.Services
                         Encoding.UTF8.GetBytes(jwtKey))
             };
     });
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration =
+        builder.Configuration["Redis:ConnectionString"];
+});
 
 builder.Services.AddAuthorization();
 var app = builder.Build();
@@ -159,17 +182,21 @@ using (var scope = app.Services.CreateScope())
         .SeedStatesAndCounties(db);
 }
 
+
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
 //{
 //    app.MapOpenApi();
 
-//}
+//}]
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowUI");
 //jwt start //
 app.UseAuthentication();
+
 
 app.UseAuthorization();
 //jwt end //

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.Metrics;
 using WebApplication1.entites;
+using WebApplication1.entites.Audits;
 
 
 public class AppDbContext : DbContext
@@ -39,9 +40,30 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<ClientCompanyBranchAccess>()
             .ToTable("ClientCompanyBranchAccesses");
+
+        //indexes 
+        modelBuilder.Entity<AdminUser>()
+            .HasIndex(x => x.Email).IsUnique();
+        modelBuilder.Entity<Client>().HasIndex(x => x.Email).IsUnique();
+
+        modelBuilder.Entity<Company>()
+            .HasIndex(x => x.Name).IsUnique();
+        modelBuilder.Entity<States>()
+            .HasIndex(x => x.StateCode).IsUnique();
+        modelBuilder.Entity<County>()
+            .HasIndex(x => x.CountyCode).IsUnique();
+        modelBuilder.Entity<CompanyStateCountyAccess>()
+            .HasIndex(x => new
+            {
+                x.CompanyId,
+                x.CountyId
+            });
+
+        
     }
 
     // Tables
+    public DbSet<AdminUser> Users { get; set; }
     public DbSet<Company> Companies { get; set; }
     public DbSet<States> States { get; set; }
 
@@ -52,6 +74,8 @@ public class AppDbContext : DbContext
 
     public DbSet<Client> Clients { get; set; }
     public DbSet<ClientCompanyBranchAccess> ClientCompanyBranchAccesses { get; set; }
+
+    public DbSet<AuditLogs> AuditLogs { get; set; }
     // Later:
     // public DbSet<Branch> Branches { get; set; }
     // public DbSet<Client> Clients { get; set; }

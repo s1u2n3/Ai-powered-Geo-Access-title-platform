@@ -7,34 +7,16 @@
     "longitude": 75.7139,
     "counties": [
       {
-        "countyCode": "BLR",
-        "countyName": "Bangalore Urban",
-        "latitude": 12.9716,
-        "longitude": 77.5946
+        "countyCode": "BGK",
+        "countyName": "Bagalkote",
+        "latitude": 16.1817,
+        "longitude": 75.6961
       },
       {
-        "countyCode": "MYS",
-        "countyName": "Mysore",
-        "latitude": 12.2958,
-        "longitude": 76.6394
-      },
-      {
-        "countyCode": "MND",
-        "countyName": "Mandya",
-        "latitude": 12.5239,
-        "longitude": 76.8958
-      },
-      {
-        "countyCode": "HBL",
-        "countyName": "Hubli",
-        "latitude": 15.3647,
-        "longitude": 75.1240
-      },
-      {
-        "countyCode": "DWD",
-        "countyName": "Dharwad",
-        "latitude": 15.4589,
-        "longitude": 75.0078
+        "countyCode": "BLL",
+        "countyName": "Ballari",
+        "latitude": 15.1394,
+        "longitude": 76.9214
       },
       {
         "countyCode": "BLG",
@@ -43,28 +25,172 @@
         "longitude": 74.4977
       },
       {
+        "countyCode": "BRR",
+        "countyName": "Bengaluru Rural",
+        "latitude": 13.2257,
+        "longitude": 77.5750
+      },
+      {
+        "countyCode": "BLR",
+        "countyName": "Bengaluru Urban",
+        "latitude": 12.9716,
+        "longitude": 77.5946
+      },
+      {
+        "countyCode": "BDR",
+        "countyName": "Bidar",
+        "latitude": 17.9149,
+        "longitude": 77.5046
+      },
+      {
+        "countyCode": "CMN",
+        "countyName": "Chamarajanagar",
+        "latitude": 11.9261,
+        "longitude": 76.9400
+      },
+      {
+        "countyCode": "CKB",
+        "countyName": "Chikkaballapur",
+        "latitude": 13.4350,
+        "longitude": 77.7315
+      },
+      {
+        "countyCode": "CKM",
+        "countyName": "Chikkamagaluru",
+        "latitude": 13.3153,
+        "longitude": 75.7754
+      },
+      {
+        "countyCode": "CTD",
+        "countyName": "Chitradurga",
+        "latitude": 14.2251,
+        "longitude": 76.3980
+      },
+      {
+        "countyCode": "DK",
+        "countyName": "Dakshina Kannada",
+        "latitude": 12.9141,
+        "longitude": 74.8560
+      },
+      {
+        "countyCode": "DVG",
+        "countyName": "Davanagere",
+        "latitude": 14.4644,
+        "longitude": 75.9218
+      },
+      {
+        "countyCode": "DWD",
+        "countyName": "Dharwad",
+        "latitude": 15.4589,
+        "longitude": 75.0078
+      },
+      {
+        "countyCode": "GDG",
+        "countyName": "Gadag",
+        "latitude": 15.4315,
+        "longitude": 75.6355
+      },
+      {
+        "countyCode": "HSN",
+        "countyName": "Hassan",
+        "latitude": 13.0033,
+        "longitude": 76.1004
+      },
+      {
+        "countyCode": "HVR",
+        "countyName": "Haveri",
+        "latitude": 14.7935,
+        "longitude": 75.4045
+      },
+      {
+        "countyCode": "KLB",
+        "countyName": "Kalaburagi",
+        "latitude": 17.3297,
+        "longitude": 76.8343
+      },
+      {
+        "countyCode": "KDG",
+        "countyName": "Kodagu",
+        "latitude": 12.4244,
+        "longitude": 75.7382
+      },
+      {
         "countyCode": "KLR",
         "countyName": "Kolar",
         "latitude": 13.1367,
         "longitude": 78.1291
       },
       {
+        "countyCode": "KPL",
+        "countyName": "Koppal",
+        "latitude": 15.3452,
+        "longitude": 76.1548
+      },
+      {
+        "countyCode": "MND",
+        "countyName": "Mandya",
+        "latitude": 12.5239,
+        "longitude": 76.8958
+      },
+      {
+        "countyCode": "MYS",
+        "countyName": "Mysuru",
+        "latitude": 12.2958,
+        "longitude": 76.6394
+      },
+      {
+        "countyCode": "RCR",
+        "countyName": "Raichur",
+        "latitude": 16.2076,
+        "longitude": 77.3463
+      },
+      {
+        "countyCode": "RMN",
+        "countyName": "Ramanagara",
+        "latitude": 12.7219,
+        "longitude": 77.2810
+      },
+      {
+        "countyCode": "SMG",
+        "countyName": "Shivamogga",
+        "latitude": 13.9299,
+        "longitude": 75.5681
+      },
+      {
         "countyCode": "TMK",
-        "countyName": "Tumkur",
+        "countyName": "Tumakuru",
         "latitude": 13.3409,
         "longitude": 77.1010
       },
       {
-        "countyCode": "CKM",
-        "countyName": "Chikmagalur",
-        "latitude": 13.3153,
-        "longitude": 75.7754
+        "countyCode": "UDP",
+        "countyName": "Udupi",
+        "latitude": 13.3409,
+        "longitude": 74.7421
       },
       {
-        "countyCode": "MNG",
-        "countyName": "Mangalore",
-        "latitude": 12.9141,
-        "longitude": 74.8560
+        "countyCode": "UTK",
+        "countyName": "Uttara Kannada",
+        "latitude": 14.8136,
+        "longitude": 74.1297
+      },
+      {
+        "countyCode": "VJP",
+        "countyName": "Vijayapura",
+        "latitude": 16.8302,
+        "longitude": 75.7100
+      },
+      {
+        "countyCode": "YDG",
+        "countyName": "Yadgir",
+        "latitude": 16.7704,
+        "longitude": 77.1376
+      },
+      {
+        "countyCode": "VJN",
+        "countyName": "Vijayanagara",
+        "latitude": 15.2695,
+        "longitude": 76.3871
       }
     ]
   },
@@ -75,6 +201,18 @@
     "latitude": 11.1271,
     "longitude": 78.6569,
     "counties": [
+      {
+        "countyCode": "ARI",
+        "countyName": "Ariyalur",
+        "latitude": 11.1385,
+        "longitude": 79.0756
+      },
+      {
+        "countyCode": "CGL",
+        "countyName": "Chengalpattu",
+        "latitude": 12.6819,
+        "longitude": 79.9835
+      },
       {
         "countyCode": "CHE",
         "countyName": "Chennai",
@@ -88,16 +226,22 @@
         "longitude": 76.9558
       },
       {
-        "countyCode": "MDU",
-        "countyName": "Madurai",
-        "latitude": 9.9252,
-        "longitude": 78.1198
+        "countyCode": "CUD",
+        "countyName": "Cuddalore",
+        "latitude": 11.7447,
+        "longitude": 79.7680
       },
       {
-        "countyCode": "SLM",
-        "countyName": "Salem",
-        "latitude": 11.6643,
-        "longitude": 78.1460
+        "countyCode": "DPM",
+        "countyName": "Dharmapuri",
+        "latitude": 12.1211,
+        "longitude": 78.1582
+      },
+      {
+        "countyCode": "DGL",
+        "countyName": "Dindigul",
+        "latitude": 10.3673,
+        "longitude": 77.9803
       },
       {
         "countyCode": "ERD",
@@ -106,22 +250,130 @@
         "longitude": 77.7172
       },
       {
-        "countyCode": "TPR",
-        "countyName": "Tiruppur",
-        "latitude": 11.1085,
-        "longitude": 77.3411
+        "countyCode": "KLK",
+        "countyName": "Kallakurichi",
+        "latitude": 11.7380,
+        "longitude": 78.9630
       },
       {
-        "countyCode": "TRC",
-        "countyName": "Trichy",
+        "countyCode": "KPM",
+        "countyName": "Kanchipuram",
+        "latitude": 12.8342,
+        "longitude": 79.7036
+      },
+      {
+        "countyCode": "KNY",
+        "countyName": "Kanniyakumari",
+        "latitude": 8.0883,
+        "longitude": 77.5385
+      },
+      {
+        "countyCode": "KRR",
+        "countyName": "Karur",
+        "latitude": 10.9601,
+        "longitude": 78.0766
+      },
+      {
+        "countyCode": "KGI",
+        "countyName": "Krishnagiri",
+        "latitude": 12.5186,
+        "longitude": 78.2137
+      },
+      {
+        "countyCode": "MDU",
+        "countyName": "Madurai",
+        "latitude": 9.9252,
+        "longitude": 78.1198
+      },
+      {
+        "countyCode": "MYD",
+        "countyName": "Mayiladuthurai",
+        "latitude": 11.1035,
+        "longitude": 79.6550
+      },
+      {
+        "countyCode": "NGP",
+        "countyName": "Nagapattinam",
+        "latitude": 10.7656,
+        "longitude": 79.8428
+      },
+      {
+        "countyCode": "NMK",
+        "countyName": "Namakkal",
+        "latitude": 11.2194,
+        "longitude": 78.1674
+      },
+      {
+        "countyCode": "NLG",
+        "countyName": "Nilgiris",
+        "latitude": 11.4064,
+        "longitude": 76.6932
+      },
+      {
+        "countyCode": "PRM",
+        "countyName": "Perambalur",
+        "latitude": 11.2342,
+        "longitude": 78.8800
+      },
+      {
+        "countyCode": "PDK",
+        "countyName": "Pudukkottai",
+        "latitude": 10.3797,
+        "longitude": 78.8208
+      },
+      {
+        "countyCode": "RMD",
+        "countyName": "Ramanathapuram",
+        "latitude": 9.3716,
+        "longitude": 78.8308
+      },
+      {
+        "countyCode": "RPT",
+        "countyName": "Ranipet",
+        "latitude": 12.9273,
+        "longitude": 79.3333
+      },
+      {
+        "countyCode": "SLM",
+        "countyName": "Salem",
+        "latitude": 11.6643,
+        "longitude": 78.1460
+      },
+      {
+        "countyCode": "SVG",
+        "countyName": "Sivaganga",
+        "latitude": 9.8470,
+        "longitude": 78.4836
+      },
+      {
+        "countyCode": "TSI",
+        "countyName": "Tenkasi",
+        "latitude": 8.9590,
+        "longitude": 77.3152
+      },
+      {
+        "countyCode": "TNJ",
+        "countyName": "Thanjavur",
+        "latitude": 10.7867,
+        "longitude": 79.1378
+      },
+      {
+        "countyCode": "THN",
+        "countyName": "Theni",
+        "latitude": 10.0104,
+        "longitude": 77.4768
+      },
+      {
+        "countyCode": "TTK",
+        "countyName": "Thoothukudi",
+        "latitude": 8.7642,
+        "longitude": 78.1348
+      },
+      {
+        "countyCode": "TRY",
+        "countyName": "Tiruchirappalli",
         "latitude": 10.7905,
         "longitude": 78.7047
-      },
-      {
-        "countyCode": "VLR",
-        "countyName": "Vellore",
-        "latitude": 12.9165,
-        "longitude": 79.1325
       },
       {
         "countyCode": "TNV",
@@ -130,10 +382,52 @@
         "longitude": 77.7567
       },
       {
-        "countyCode": "KNY",
-        "countyName": "Kanyakumari",
-        "latitude": 8.0883,
-        "longitude": 77.5385
+        "countyCode": "TPR",
+        "countyName": "Tiruppur",
+        "latitude": 11.1085,
+        "longitude": 77.3411
+      },
+      {
+        "countyCode": "TLR",
+        "countyName": "Tiruvallur",
+        "latitude": 13.1439,
+        "longitude": 79.9089
+      },
+      {
+        "countyCode": "TVM",
+        "countyName": "Tiruvannamalai",
+        "latitude": 12.2253,
+        "longitude": 79.0747
+      },
+      {
+        "countyCode": "TVR",
+        "countyName": "Tiruvarur",
+        "latitude": 10.7725,
+        "longitude": 79.6368
+      },
+      {
+        "countyCode": "VLR",
+        "countyName": "Vellore",
+        "latitude": 12.9165,
+        "longitude": 79.1325
+      },
+      {
+        "countyCode": "VPM",
+        "countyName": "Viluppuram",
+        "latitude": 11.9401,
+        "longitude": 79.4861
+      },
+      {
+        "countyCode": "VRD",
+        "countyName": "Virudhunagar",
+        "latitude": 9.5851,
+        "longitude": 77.9570
+      },
+      {
+        "countyCode": "TPT",
+        "countyName": "Tirupathur",
+        "latitude": 12.4957,
+        "longitude": 78.5678
       }
     ]
   },
@@ -145,50 +439,38 @@
     "longitude": 79.7400,
     "counties": [
       {
-        "countyCode": "VSK",
-        "countyName": "Visakhapatnam",
-        "latitude": 17.6868,
-        "longitude": 83.2185
+        "countyCode": "AKP",
+        "countyName": "Anakapalli",
+        "latitude": 17.6913,
+        "longitude": 83.0039
       },
       {
-        "countyCode": "VJW",
-        "countyName": "Vijayawada",
-        "latitude": 16.5062,
-        "longitude": 80.6480
-      },
-      {
-        "countyCode": "GNT",
-        "countyName": "Guntur",
-        "latitude": 16.3067,
-        "longitude": 80.4365
-      },
-      {
-        "countyCode": "NEL",
-        "countyName": "Nellore",
-        "latitude": 14.4426,
-        "longitude": 79.9865
-      },
-      {
-        "countyCode": "KDP",
-        "countyName": "Kadapa",
-        "latitude": 14.4673,
-        "longitude": 78.8242
-      },
-      {
-        "countyCode": "KNL",
-        "countyName": "Kurnool",
-        "latitude": 15.8281,
-        "longitude": 78.0373
-      },
-      {
-        "countyCode": "ANP",
+        "countyCode": "ANT",
         "countyName": "Anantapur",
         "latitude": 14.6819,
         "longitude": 77.6006
       },
       {
-        "countyCode": "RJM",
-        "countyName": "Rajahmundry",
+        "countyCode": "ASR",
+        "countyName": "Alluri Sitharama Raju",
+        "latitude": 17.7200,
+        "longitude": 81.8300
+      },
+      {
+        "countyCode": "BPT",
+        "countyName": "Bapatla",
+        "latitude": 15.9042,
+        "longitude": 80.4675
+      },
+      {
+        "countyCode": "CTR",
+        "countyName": "Chittoor",
+        "latitude": 13.2172,
+        "longitude": 79.1003
+      },
+      {
+        "countyCode": "EGD",
+        "countyName": "East Godavari",
         "latitude": 17.0005,
         "longitude": 81.8040
       },
@@ -199,10 +481,118 @@
         "longitude": 81.0952
       },
       {
-        "countyCode": "ONG",
-        "countyName": "Ongole",
+        "countyCode": "GNT",
+        "countyName": "Guntur",
+        "latitude": 16.3067,
+        "longitude": 80.4365
+      },
+      {
+        "countyCode": "KKN",
+        "countyName": "Kakinada",
+        "latitude": 16.9891,
+        "longitude": 82.2475
+      },
+      {
+        "countyCode": "KRS",
+        "countyName": "Konaseema",
+        "latitude": 16.5780,
+        "longitude": 82.0060
+      },
+      {
+        "countyCode": "KRN",
+        "countyName": "Kurnool",
+        "latitude": 15.8281,
+        "longitude": 78.0373
+      },
+      {
+        "countyCode": "NTR",
+        "countyName": "NTR",
+        "latitude": 16.5062,
+        "longitude": 80.6480
+      },
+      {
+        "countyCode": "NDL",
+        "countyName": "Nandyal",
+        "latitude": 15.4786,
+        "longitude": 78.4831
+      },
+      {
+        "countyCode": "PAL",
+        "countyName": "Palnadu",
+        "latitude": 16.4800,
+        "longitude": 79.5500
+      },
+      {
+        "countyCode": "PAR",
+        "countyName": "Parvathipuram Manyam",
+        "latitude": 18.7800,
+        "longitude": 83.4200
+      },
+      {
+        "countyCode": "PRK",
+        "countyName": "Prakasam",
         "latitude": 15.5057,
         "longitude": 80.0499
+      },
+      {
+        "countyCode": "SKL",
+        "countyName": "Srikakulam",
+        "latitude": 18.2969,
+        "longitude": 83.8975
+      },
+      {
+        "countyCode": "SAT",
+        "countyName": "Sri Sathya Sai",
+        "latitude": 14.1667,
+        "longitude": 77.8000
+      },
+      {
+        "countyCode": "TPT",
+        "countyName": "Tirupati",
+        "latitude": 13.6288,
+        "longitude": 79.4192
+      },
+      {
+        "countyCode": "VSP",
+        "countyName": "Visakhapatnam",
+        "latitude": 17.6868,
+        "longitude": 83.2185
+      },
+      {
+        "countyCode": "VZM",
+        "countyName": "Vizianagaram",
+        "latitude": 18.1067,
+        "longitude": 83.3956
+      },
+      {
+        "countyCode": "WGD",
+        "countyName": "West Godavari",
+        "latitude": 16.5449,
+        "longitude": 81.5212
+      },
+      {
+        "countyCode": "YSR",
+        "countyName": "YSR Kadapa",
+        "latitude": 14.4673,
+        "longitude": 78.8242
+      },
+      {
+        "countyCode": "ANM",
+        "countyName": "Annamayya",
+        "latitude": 14.1800,
+        "longitude": 79.1600
+      },
+      {
+        "countyCode": "MCR",
+        "countyName": "B.R. Ambedkar Konaseema",
+        "latitude": 16.5780,
+        "longitude": 82.0060
+      },
+      {
+        "countyCode": "PCH",
+        "countyName": "Potti Sriramulu Nellore",
+        "latitude": 14.4426,
+        "longitude": 79.9865
       }
     ]
   },

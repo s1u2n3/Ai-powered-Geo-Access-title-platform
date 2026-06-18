@@ -30,7 +30,11 @@ namespace WebApplication1.Repositories.Implementations
 
                 // later activation flow
                 PasswordHash = "",
+                EmailVerificationToken =
+        Guid.NewGuid().ToString(),
 
+                VerificationTokenExpiry =
+        DateTime.UtcNow.AddHours(24),
                 IsEmailVerified = false,
                 IsActive = true,
                 CreatedDate = DateTime.UtcNow

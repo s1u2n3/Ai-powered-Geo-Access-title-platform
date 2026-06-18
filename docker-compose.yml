@@ -35,8 +35,23 @@ services:
       - sqlserver_data:/var/opt/mssql
       - ./sqlserver/backup:/backup
 
-     restart: unless-stopped  
-    
+     restart: unless-stopped 
+  redis:
+     image: redis:7
+     container_name: redis-cache
+     ports:
+      - "6379:6379"
+     volumes:
+      - redis_data:/data
+     restart: unless-stopped 
+  fastapi:
+    build:
+      context: ./FastApi
+    container_name: geoaccess-fastapi
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
 
   api:
     build:
@@ -53,6 +68,8 @@ services:
     depends_on:
       - sqlserver
       - postgres
+      - redis
+      - fastapi
 
     restart: unless-stopped
 
@@ -76,3 +93,7 @@ volumes:
     name: ai-power-accesscontrolsystem_postgres_data
 
   sqlserver_data:
+
+  redis_data:
+  
+  

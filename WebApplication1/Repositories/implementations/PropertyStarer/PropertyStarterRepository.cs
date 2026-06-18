@@ -2,6 +2,9 @@
 using WebApplication1.Dto.PropertySearch;
 using WebApplication1.entites.StarterEntities;
 using WebApplication1.Repositories.Interfaces;
+using NetTopologySuite.IO;
+using System.Text.Json;
+using WebApplication1.Dto;
 
 namespace WebApplication1.Repositories.implementations.PropertyStarer
 {
@@ -15,13 +18,11 @@ namespace WebApplication1.Repositories.implementations.PropertyStarer
 
         public async Task<PropertyStaterDto> GetParcelWithStarterAsync(string parcelId)
         {
-            var parcel = await _context.Parcels.FirstOrDefaultAsync(x => x.ParcelId == parcelId);
+            var parcel = await _context.Parcels.FirstOrDefaultAsync(x => x.ParcelId == parcelId);           
 
-            if(parcel == null)
-            {
-                Console.WriteLine(_context.Database.GetConnectionString());
+            if (parcel == null)
+            {               
                 return null;
-              
             }
             StarterPackage starterPackage = null;
             List<StarterIssue> stareterIssue = new();
@@ -34,6 +35,7 @@ namespace WebApplication1.Repositories.implementations.PropertyStarer
                     stareterIssue = await _context.StarterIssue.Where(x => x.StarterPackageId == starterPackage.Id).ToListAsync();
                 }
             }
+           
             return new PropertyStaterDto
             {
                 Parcel = parcel,

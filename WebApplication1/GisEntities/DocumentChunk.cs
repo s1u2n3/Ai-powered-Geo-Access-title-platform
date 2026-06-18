@@ -17,3 +17,9 @@ public class DocumentChunk
 
     public Vector Embedding { get; set; }
 }
+public class ChunkSearchResult
+{
+    public DocumentChunk Chunk { get; set; }
+
+    public double Distance { get; set; }
+}
