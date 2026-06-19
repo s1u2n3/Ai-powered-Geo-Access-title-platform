@@ -70,8 +70,8 @@ jobs:
             docker pull 755035179764.dkr.ecr.eu-north-1.amazonaws.com/geoaccess-api:latest
             docker pull 755035179764.dkr.ecr.eu-north-1.amazonaws.com/geoaccess-ui:latest
 
-            cd ~/geoaccess
-
+            cd ~/geoaccess/Ai-powered-Geo-Access-title-platform
+            git pull origin develop
             docker compose -f docker-compose.prod.yml up -d api ui
 
             docker image prune -f

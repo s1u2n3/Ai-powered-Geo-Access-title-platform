@@ -1,0 +1,58 @@
+services:
+
+  postgres:
+    image: 755035179764.dkr.ecr.eu-north-1.amazonaws.com/geoaccess-postgres:latest
+    container_name: ai-postgres-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ivar.,.@123P
+      POSTGRES_DB: geoaccessdbVG
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver-db
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "ivar.,.@123S"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    restart: unless-stopped
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+    - "6379:6379"
+    restart: unless-stopped
+
+  api:
+    image: 755035179764.dkr.ecr.eu-north-1.amazonaws.com/geoaccess-api:latest
+    container_name: api-test
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+    ports:
+      - "8080:8080"
+    depends_on:
+      - sqlserver
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  ui:
+    image: 755035179764.dkr.ecr.eu-north-1.amazonaws.com/geoaccess-ui:latest
+    container_name: ui-test
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  sqlserver_data:
