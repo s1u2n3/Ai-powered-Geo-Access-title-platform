@@ -53,6 +53,12 @@ services:
       - api
     restart: unless-stopped
 
+
 volumes:
   postgres_data:
+    external: true
+    name: ai-powered-geo-access-title-platform_postgres_data
+
   sqlserver_data:
+    external: true
+    name: ai-powered-geo-access-title-platform_sqlserver_data
