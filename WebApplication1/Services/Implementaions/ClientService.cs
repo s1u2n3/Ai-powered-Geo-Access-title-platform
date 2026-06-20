@@ -79,7 +79,7 @@ namespace WebApplication1.Services.Implementations
                 _configuration["EmailSettings:FromName"];
 
             var activationLink =
-     $"http://geoaccess.webhop.me/activate-account?token={token}";
+     $"http://geoaccesstitle.webhop.me/activate-account?token={token}";
 
             var message = new MimeMessage();
 
