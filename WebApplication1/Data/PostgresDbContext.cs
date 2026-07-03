@@ -34,7 +34,7 @@ public class PostgresDbContext
         modelBuilder.HasPostgresExtension("vector");
         modelBuilder.Entity<DocumentChunk>()
             .Property(x => x.Embedding)
-            .HasColumnType("vector(768)");
+            .HasColumnType("vector(3072)");
         modelBuilder.Entity<DocumentProcessingJob>()
     .HasMany(x => x.Items)
     .WithOne(x => x.Job)

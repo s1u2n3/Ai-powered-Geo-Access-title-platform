@@ -25,13 +25,14 @@ public class DocumentProcessingService
     private readonly HttpClient _httpClient;
     private readonly PostgresDbContext _postgresdb;
     private readonly IQueueService _queueService;
+    private readonly IConfiguration _configuration;
 
     private readonly
         IDocumentChunkRepository
             _chunkRepository;
     private readonly EmbeddingsService _embeddingsService;
 
-    public DocumentProcessingService(S3Service s3Service, IDocumentChunkRepository chunkRepository, EmbeddingsService embeddingsService, HttpClient httpClient,PostgresDbContext postgresDb, IQueueService queueService)
+    public DocumentProcessingService(S3Service s3Service,IConfiguration configuration, IDocumentChunkRepository chunkRepository, EmbeddingsService embeddingsService, HttpClient httpClient,PostgresDbContext postgresDb, IQueueService queueService)
     {
         _s3Service = s3Service;
         _chunkRepository = chunkRepository;
@@ -59,6 +60,7 @@ public class DocumentProcessingService
 
         foreach (var document in documents)
         {
+            Console.WriteLine($"Creating item for {document.Key}");
             var item = new DocumentProcessingItem
             {
                 Id = Guid.NewGuid(),
@@ -80,6 +82,8 @@ public class DocumentProcessingService
                    ParcelId = parcelId,
                    S3Key = document.Key
                });
+            Console.WriteLine($"SQS sent for {document.Key}");
+
         }
             
             return job.Id;       
@@ -168,6 +172,8 @@ public class DocumentProcessingService
         Stream pdfStream,
         string s3Key)
     {
+
+        var fastapiUrl = _configuration["FastApi:url"];
         using var form =
             new MultipartFormDataContent();
 
@@ -178,7 +184,7 @@ public class DocumentProcessingService
 
          var response =
             await _httpClient.PostAsync(
-                "http://fastapi-service:8000/process-document-with-embeddings",
+                fastapiUrl,
                 form);
 
         response.EnsureSuccessStatusCode();

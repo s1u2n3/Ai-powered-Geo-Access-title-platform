@@ -48,7 +48,7 @@ namespace WebApplication1.Migrations.PostgresDb
 
                     b.Property<Vector>("Embedding")
                         .IsRequired()
-                        .HasColumnType("vector(768)");
+                        .HasColumnType("vector(3072)");
 
                     b.Property<string>("ParcelId")
                         .IsRequired()

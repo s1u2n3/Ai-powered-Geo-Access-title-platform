@@ -48,6 +48,7 @@ import tempfile
 from enum import Enum
 from typing import Optional
 from dataclasses import dataclass, field
+import requests
 
 # ── Stub unstructured's optional imports so it doesn't crash on Windows ──────
 def _stub(name: str, attrs: dict | None = None):
@@ -113,7 +114,7 @@ class Config:
     # Chunking limits (in tokens — matches embedding model context)
     MAX_TOKENS_PER_CHUNK  = 400   # hard ceiling
     SOFT_TOKEN_TARGET     = 300   # try to stay under this
-    MIN_TOKENS_TO_KEEP    = 20    # discard chunks smaller than this
+    MIN_TOKENS_TO_KEEP    = 10  # discard chunks smaller than this
 
     # pdfplumber table detection — tries line-based first, text-based fallback
     TABLE_SETTINGS_LINES = {
@@ -1136,21 +1137,53 @@ async def process_document_endpoint(file: UploadFile = File(...)):
             os.remove(tmp_path)
 
 
+# def generate_embedding(text: str):
+
+#     response = requests.post(
+#         "http://localhost:11434/api/embeddings",
+#         json={
+#             "model": "nomic-embed-text",
+#             "prompt": text
+#         },
+#         timeout=120
+#     )
+
+#     response.raise_for_status()
+
+#     return response.json()["embedding"]
 def generate_embedding(text: str):
 
+    # api_key = os.getenv("AQ.Ab8RN6JF9lQVgcEB-c1OhZy_p299YQv0xUMDH3uZ2B3muCPnWQ")
+    api_key="AQ.Ab8RN6JF9lQVgcEB-c1OhZy_p299YQv0xUMDH3uZ2B3muCPnWQ";
+
     response = requests.post(
-        "http://localhost:11434/api/embeddings",
+        f"https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key={api_key}",
         json={
-            "model": "nomic-embed-text",
-            "prompt": text
+            "model": "models/gemini-embedding-001",
+            "content": {
+                "parts": [
+                    {
+                        "text": text
+                    }
+                ]
+            }
         },
         timeout=120
     )
 
     response.raise_for_status()
 
-    return response.json()["embedding"]
+    return response.json()["embedding"]["values"]
 
+# @app.get("/test-embedding")
+# def test_embedding():
+
+#     embedding = generate_embedding("Hello World")
+
+#     return {
+#         "dimension": len(embedding),
+#         "sample": embedding[:5]
+#     }
 
 def build_embedding_text(
     document_type: str,

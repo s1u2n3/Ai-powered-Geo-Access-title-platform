@@ -30,7 +30,12 @@ services:
     ports:
     - "6379:6379"
     restart: unless-stopped
-
+  fastapi:
+    image: 755035179764.dkr.ecr.eu-north-1.amazonaws.com/geoaccess-fastapi:latest
+    container_name: fastapi-service
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
   api:
     image: 755035179764.dkr.ecr.eu-north-1.amazonaws.com/geoaccess-api:latest
     container_name: api-test
@@ -42,8 +47,9 @@ services:
       - sqlserver
       - postgres
       - redis
+      - fastapi
+      
     restart: unless-stopped
-
   ui:
     image: 755035179764.dkr.ecr.eu-north-1.amazonaws.com/geoaccess-ui:latest
     container_name: ui-test

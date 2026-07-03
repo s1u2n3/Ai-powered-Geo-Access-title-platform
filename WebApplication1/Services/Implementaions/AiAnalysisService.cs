@@ -26,15 +26,17 @@ public class AIAnalysisService
     private readonly HttpClient _httpClient;
     private readonly IStarterRepository _starterRepository;
     private readonly IVectorSearchInterface _vectorSearchService;
+    private readonly IConfiguration _configuration;
 
 
 
-    public AIAnalysisService(PostgresDbContext context ,HttpClient httpClient, IStarterRepository  starterRepository,IVectorSearchInterface vectorSearchInterface)
+    public AIAnalysisService(PostgresDbContext context ,IConfiguration configuration,HttpClient httpClient, IStarterRepository  starterRepository,IVectorSearchInterface vectorSearchInterface)
     {
         _context = context;
         _httpClient=httpClient;
         _starterRepository = starterRepository;
         _vectorSearchService = vectorSearchInterface;
+        _configuration = configuration;
     }
 
     public async Task<string>
@@ -442,35 +444,77 @@ RETURN THIS EXACT JSON STRUCTURE:
     }
 
 
-    private async Task<string>
-   CallLLMAsync(string prompt)
+    //private async Task<string>CallLLMAsync(string prompt)
+    //{
+    //    var request = new
+    //    {
+    //        model = "llama3:8b",
+    //        prompt = prompt,
+    //        stream = false,
+    //        format = "json",
+    //        options = new
+    //        {
+    //            temperature = 0.1
+    //        }
+
+    //    };
+
+    //    var response =
+    //        await _httpClient
+    //            .PostAsJsonAsync(
+    //                "http://localhost:11434/api/generate",
+    //                request);
+    //    var result =
+    //await response.Content
+    //    .ReadFromJsonAsync<LlmResponse>();
+
+
+
+    //    return result.response;
+
+
+
+    //}
+
+    private async Task<string> CallLLMAsync(string prompt)
     {
+        var apiKey = _configuration["Gemini:ApiKey"];
+
         var request = new
         {
-            model = "llama3:8b",
-            prompt = prompt,
-            stream = false,
-            format = "json",
-            options = new
+            contents = new[]
             {
-                temperature = 0.1
+            new
+            {
+                parts = new[]
+                {
+                    new
+                    {
+                        text = prompt
+                    }
+                }
             }
-
+        },
+            generationConfig = new
+            {
+                temperature = 0.1,
+                responseMimeType = "application/json"
+            }
         };
 
-        var response =
-            await _httpClient
-                .PostAsJsonAsync(
-                    "http://localhost:11434/api/generate",
-                    request);
+        var response = await _httpClient.PostAsJsonAsync(
+            $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={apiKey}",
+            request); var responseText =
+    await response.Content.ReadAsStringAsync();
+
+        response.EnsureSuccessStatusCode();
+
         var result =
-    await response.Content
-        .ReadFromJsonAsync<LlmResponse>();
+            await response.Content.ReadFromJsonAsync<GeminiResponse>();
 
-        
-
-        return result.response;
-
-   
+        return result.Candidates[0]
+                     .Content
+                     .Parts[0]
+                     .Text;
     }
 }

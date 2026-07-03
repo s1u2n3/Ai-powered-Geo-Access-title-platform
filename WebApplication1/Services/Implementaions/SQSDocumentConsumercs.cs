@@ -34,6 +34,7 @@ namespace WebApplication1.Services.Implementaions
                 var messages =
                     await queueService
                         .RecieveMessageAsync();
+                Console.WriteLine($"Received {messages.Count} messages");
 
                 if (messages == null || !messages.Any())
                 {
@@ -106,6 +107,8 @@ namespace WebApplication1.Services.Implementaions
                     }
                     catch (Exception ex)
                     {
+                        Console.WriteLine(ex.ToString());
+
                         await documentProcessingService
                             .MarkFailedAsync(
                                 queueMessage.ItemId,
