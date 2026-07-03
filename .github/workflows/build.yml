@@ -61,7 +61,7 @@ jobs:
 
       - name: Build FastAPI Image
         run: |
-          docker build -t geoaccess-fastapi ./fastApi
+          docker build -t geoaccess-fastapi ./fastapi
           docker tag geoaccess-fastapi:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/geoaccess-fastapi:latest
 
       - name: Push FastAPI Image
