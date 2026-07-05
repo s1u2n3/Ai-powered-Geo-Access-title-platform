@@ -40,6 +40,7 @@ public class DocumentProcessingService
         _httpClient = httpClient;
         _postgresdb = postgresDb;
         _queueService = queueService;
+        _configuration = configuration;        
     }
 
 
