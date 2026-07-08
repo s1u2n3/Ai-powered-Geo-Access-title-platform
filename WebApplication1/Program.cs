@@ -173,13 +173,14 @@ builder.Services.AddAuthorization();
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
-    var db =
-        scope.ServiceProvider
-            .GetRequiredService<AppDbContext>();
+    var services = scope.ServiceProvider;
+    var db =services.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
 
 
-    await StateAndCountySeeder
-        .SeedStatesAndCounties(db);
+    await StateAndCountySeeder.SeedStatesAndCounties(db);
+    var postgresDb = services.GetRequiredService<PostgresDbContext>();
+    postgresDb.Database.Migrate();
 }
 
 
