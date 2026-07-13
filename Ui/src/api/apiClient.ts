@@ -27,3 +27,7 @@ apiClient.interceptors.request.use((config) => {
 })
 
 export default apiClient
+
+export const analyzeParcel = (parcelId: string, question: string) => {
+  return apiClient.post('/AI/analyze', { parcelId, question })
+}

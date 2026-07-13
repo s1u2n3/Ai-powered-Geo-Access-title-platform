@@ -9,53 +9,34 @@ import {
   Typography,
 } from '@mui/material'
 import PlayCircleIcon from '@mui/icons-material/PlayCircle'
-
-const starterStorageKey = 'adminStarterJson'
-
-const sampleStarterJson = `{
-  "parcelSummary": {
-    "surveyNo": "117/3B",
-    "hissaNo": "3B",
-    "village": "Hebbal Extension",
-    "hobli": "Kasaba Hobli",
-    "taluk": "Mysuru",
-    "district": "Mysuru",
-    "state": "Karnataka",
-    "totalArea": 1200,
-    "shapeOfPlot": "Rectangular"
-  },
-  "ownership": {
-    "ownerName": "Ravi Kumar",
-    "propertyAddress": "No. 12, 3rd Cross, Hebbal Extension, Mysuru - 570017",
-    "propertyType": "Residential - Self-Occupied"
-  },
-  "encumbrances": [
-    {
-      "ecNo": "EC-MYS-2024-14421",
-      "formType": "Form 15 (Encumbrances Exist) - Mortgage Released",
-      "periodCovered": "01 April 2015 to 31 March 2024 (9 years)",
-      "issuedBy": "Sub-Registrar, Mysuru",
-      "dateOfIssue": "5 April 2024",
-      "appliedBy": "Ravi Kumar",
-      "property": "Parcel ID P-1001, Survey No. 189/3B, Hebbal Extension, Mysuru"
-    }
-  ]
-}`
+import { analyzeParcel } from '../../../api/apiClient'
 
 function LoadFullStarter() {
-  const [starterJson, setStarterJson] = useState(() => window.localStorage.getItem(starterStorageKey) || sampleStarterJson)
+  const [parcelId, setParcelId] = useState('')
   const [message, setMessage] = useState('')
   const [messageType, setMessageType] = useState<'success' | 'error'>('success')
+  const [loading, setLoading] = useState(false)
 
-  const handleLoad = () => {
-    try {
-      JSON.parse(starterJson)
-      window.localStorage.setItem(starterStorageKey, starterJson)
-      setMessageType('success')
-      setMessage('Starter JSON saved. The API call can be connected here.')
-    } catch {
+  const handleLoad = async () => {
+    if (!parcelId) {
       setMessageType('error')
-      setMessage('Invalid JSON. Please fix the starter data before loading it.')
+      setMessage('Parcel ID is required')
+      return
+    }
+
+    setLoading(true)
+    setMessage('')
+    try {
+      const resp = await analyzeParcel(parcelId, 'Load Full Starter')
+      setMessageType('success')
+      setMessage('Starter loaded successfully')
+      console.log('Analyze parcel response', resp.data)
+    } catch (err: any) {
+      setMessageType('error')
+      setMessage(err?.response?.data || 'Failed to load starter')
+      console.error(err)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -66,32 +47,24 @@ function LoadFullStarter() {
           Load Full Starter
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-          Paste the complete starter JSON and keep it ready for the load API.
+          Enter a Parcel ID and click Load to generate and persist a full starter package.
         </Typography>
       </Box>
 
       <Card sx={{ borderRadius: 2, border: '1px solid rgba(15,23,42,0.08)', boxShadow: '0 18px 45px rgba(15,23,42,0.06)' }}>
         <CardContent sx={{ p: 3 }}>
           {message && <Alert severity={messageType} sx={{ mb: 2 }}>{message}</Alert>}
+
           <TextField
-            label="Starter JSON"
-            value={starterJson}
-            onChange={(event) => setStarterJson(event.target.value)}
-            minRows={18}
-            multiline
+            label="Parcel ID"
+            value={parcelId}
+            onChange={(event) => setParcelId(event.target.value)}
             fullWidth
-            sx={{
-              '& textarea': {
-                fontFamily: 'Consolas, monospace',
-                fontSize: '0.86rem',
-                lineHeight: 1.55,
-              },
-            }}
           />
 
           <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-            <Button variant="contained" startIcon={<PlayCircleIcon />} onClick={handleLoad}>
-              Load Starter
+            <Button variant="contained" startIcon={<PlayCircleIcon />} onClick={handleLoad} disabled={loading}>
+              {loading ? 'Loading...' : 'Load Starter'}
             </Button>
           </Box>
         </CardContent>
