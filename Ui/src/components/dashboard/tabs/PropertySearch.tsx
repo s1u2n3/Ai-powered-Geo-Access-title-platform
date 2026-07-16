@@ -264,6 +264,10 @@ function PropertySearch() {
 
     setLoading(true)
     setError('')
+    setShowWorkspace(false)
+    setShowStarterDialog(false)
+    setShowMarkerDetails(false)
+    setSelectedIssue(null)
 
     try {
       const result = await fetchPropertyGeoData(request)
@@ -273,7 +277,7 @@ function PropertySearch() {
         setStarterPackage(null)
         setStarterIssues([])
         setPropertyAddress('')
-        setError('No property found for the entered Parcel ID.')
+        setError('Parcel not found')
         return
       }
 
@@ -297,10 +301,11 @@ function PropertySearch() {
       })
     } catch (searchError) {
       console.error('Failed to fetch property geo data:', searchError)
-      setError('Unable to load property details right now.')
+      setError('Parcel not found')
       setProperty(null)
       setStarterPackage(null)
       setStarterIssues([])
+      setPropertyAddress('')
     } finally {
       setLoading(false)
     }

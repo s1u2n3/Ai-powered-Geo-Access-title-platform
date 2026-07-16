@@ -12,6 +12,7 @@ using System.Text.Json;
 using UglyToad.PdfPig;
 using WebApplication1.Dto.LLM;
 using WebApplication1.entites;
+using WebApplication1.MiddleWare.Exceptions;
 using WebApplication1.Repositories.implementations;
 using WebApplication1.Services.Interfaces;
 using WebApplication1.Services.Interfaces.AiServices;
@@ -44,6 +45,20 @@ public class AIAnalysisService
             string parcelId,
             string question)
      {
+        if (string.IsNullOrWhiteSpace(parcelId))
+        {
+            throw new ValidationException("Parcel ID is required.");
+        }
+
+        var parcelExists =
+            await _context.Parcels
+                .AnyAsync(x => x.ParcelId == parcelId);
+
+        if (!parcelExists)
+        {
+            throw new NotFoundException("Parcel not found");
+        }
+
         //var chunks =
         //    await _context.DocumentChunks
         //        .Where(x =>

@@ -11,6 +11,24 @@ import {
 import PlayCircleIcon from '@mui/icons-material/PlayCircle'
 import { analyzeParcel } from '../../../api/apiClient'
 
+function getErrorMessage(err: any) {
+  const data = err?.response?.data
+
+  if (typeof data === 'string') {
+    return data
+  }
+
+  if (typeof data?.message === 'string') {
+    return data.message
+  }
+
+  if (typeof data?.Message === 'string') {
+    return data.Message
+  }
+
+  return 'Parcel not found'
+}
+
 function LoadFullStarter() {
   const [parcelId, setParcelId] = useState('')
   const [message, setMessage] = useState('')
@@ -33,7 +51,7 @@ function LoadFullStarter() {
       console.log('Analyze parcel response', resp.data)
     } catch (err: any) {
       setMessageType('error')
-      setMessage(err?.response?.data || 'Failed to load starter')
+      setMessage(getErrorMessage(err))
       console.error(err)
     } finally {
       setLoading(false)
